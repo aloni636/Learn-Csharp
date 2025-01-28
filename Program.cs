@@ -6,7 +6,7 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using System.IO;
-
+using System.Linq;  // Language-Integrated Query, allows SQL like expressions on linq enabled data structures
 using System.Data.Entity;
 
 namespace Learning.csharp
@@ -14,38 +14,68 @@ namespace Learning.csharp
     public class Program
     {
         public static void Syntax()
+
         {
             Console.WriteLine("Hello, World!");
             int oneInt = 10;
             double twoAndAHalf = 2.5;
             bool boolean = false;
-            byte byteVariable = 255;  // (0 <= byte <= 255)
-            sbyte sbyteVariable = 127;  // (-128 <= sbyte <= 127)
+            byte byteVariable = byte.MaxValue;  // (0 <= byte <= 255)
+            sbyte sbyteVariable = sbyte.MaxValue;  // (-128 <= sbyte <= 127)
             sbyte oneSbyte = 1;
             byte oneByte = 1;
             // TODO: Learn about string concatenation
+            unchecked
+            {
+                Console.WriteLine(
+                    "Int: " + oneInt +
+                    "\nDouble: " + twoAndAHalf +
+                    "\nBoolean: " + boolean +
+                    "\nByte: " + byteVariable +
+                    "\nSbyte: " + sbyteVariable +
+                    "\nByteOverflow?: " + (byteVariable + oneByte) +  // arithmetic is done on minimum element size of 32 bit / ints: https://stackoverflow.com/a/941665
+                    "\nSbyteOverflow?: " + (sbyteVariable + oneSbyte)
+                );
+            }
 
-            Console.WriteLine(
-                "Int: " + oneInt +
-                "\nDouble: " + twoAndAHalf +
-                "\nBoolean: " + boolean +
-                "\nByte: " + byteVariable +
-                "\nSbyte: " + sbyteVariable +
-                "\nByteOverflow?: " + (byteVariable + oneByte) +
-                "\nSbyteOverflow?: " + (sbyteVariable + oneSbyte)
-            );
+            Console.WriteLine(new string('-', 5));  //  String reptation 
 
-            Console.WriteLine(new string('-', 5));
+            int[] intArray = Enumerable.Range(0, 10).ToArray();  // Create array of range
+            Console.WriteLine($"Array elements: {string.Join(',', intArray)}");  // String interpolation with expressions (from version 6.0)
 
-            int[] intArray = Enumerable.Range(0, 10).ToArray();
-            Console.WriteLine("Array element: " + intArray[0]);
-            //Console.WriteLine("".Join(',', intArray));
-            List<int> ints = new List<int> { 1, 2, 3 };
+            // Lists, Dictionaries, Sets, Stacks and Queues
+
             Dictionary<string, int> dictionary = new Dictionary<string, int> {
                 {"hello", 1 }
             };
+            // Merge dictionaries with graceful handling of duplicate keys
+            Dictionary<string, int> dictionary2 = new Dictionary<string, int> {
+                {"hello", 2 },
+                {"world", 2 }
+            };
+            foreach (var item in dictionary2)
+            {
+                dictionary[item.Key] = item.Value;
+            }
+
+            // Join dictionary elements into list
+            Console.WriteLine("\nDictionary: { " + string.Join(", ", dictionary.Select(kvp => $"{kvp.Key}: {kvp.Value}"))+ "}");  // kvp = key value pair
+            Console.WriteLine("The dictionary again: { " + dictionary.Select(kvp => $"{kvp.Key}: {kvp.Value}").Aggregate((cur, next) => $"{cur}, {next}")+" }");
             Console.WriteLine("Dictionary element: " + dictionary["hello"]);
-            //Console.WriteLine("Dictionary unavailable element: " + dictionary["world"]);  // throws error
+            Console.WriteLine($"Default int value: {default(int)}");
+            Console.WriteLine("Unavailable element defaults to value's default value: " + (dictionary.GetValueOrDefault("foo").ToString()));
+            
+            List<int> intList = new List<int> { 1, 2, 3 }; // Can also be initialized using square brackets [1,2,3]
+            // Appending elements to list
+            intList.Add(4);
+            intList.AddRange([-1,-2,-3]); 
+            intList.AddRange(new List<int> { -1, -2, -3 }); 
+
+            Console.WriteLine("intList: [ " + string.Join(", ", intList.Select((i)=>i.ToString()))+" ]");
+            HashSet<int> hashSet = new HashSet<int> { 1, 2, 3, 11 };
+            HashSet<int> setRange = new HashSet<int>(Enumerable.Range(0, 10));
+            Console.WriteLine("\nhashSet union: { "+string.Join(", ", hashSet.Union(setRange).Select((i) => i.ToString()))+" }");
+            Console.WriteLine("hashSet difference: { "+string.Join(", ", hashSet.Except(setRange).Select((i) => i.ToString()))+" }");
         }
         public static void Main(string[] args)
         {
