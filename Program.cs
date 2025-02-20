@@ -318,23 +318,28 @@ namespace Learning.csharp
         public static void DependencyInjection()
         {
         }
+        public static void RunWithDivider(int dividerSize, params Action[] actions)
+        {
+            foreach (Action action in actions)
+            {
+                action();
+                Console.WriteLine('\n' + new string('-', dividerSize) + '\n');
+            }
+        }
+        public static void RunWithDivider(params Action[] actions) { RunWithDivider(Console.WindowWidth, actions); }
+
         public static void Main(string[] args)
         {
-            DataStructures();
-            Console.WriteLine('\n'+new string('-', 50)+'\n');
-            ControlStructures();
-            Console.WriteLine('\n'+new string('-', 50)+'\n');
-            Typecasting();
-            Console.WriteLine('\n'+new string('-', 50)+'\n');
-            Classes();
-            Console.WriteLine('\n' + new string('-', 50) + '\n');
-            MethodSignatures();
-            Console.WriteLine('\n' + new string('-', 50) + '\n');
-            Generics();
-            Console.WriteLine('\n' + new string('-', 50) + '\n');
-            Yields();
-            Console.WriteLine('\n' + new string('-', 50) + '\n');
-            PassByReference();
+            RunWithDivider(
+                DataStructures,
+                ControlStructures,
+                Typecasting,
+                Classes,
+                MethodSignatures,
+                Generics,
+                Yields,
+                PassByReference
+            );
 
         }
     }
