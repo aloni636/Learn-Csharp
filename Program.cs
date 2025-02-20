@@ -309,8 +309,71 @@ namespace Learning.csharp
             };
             printLargeStruct(largeStruct);
         }
+        public class Animal
+        {
+            public virtual void Eat() { Console.WriteLine("Animal is eating!"); }  // virtual marks the method as overridable by inheriting classes
+        }
+        public class Dog : Animal
+        {
+            public void Bark() { Console.WriteLine("Dog is barking!"); }
+            public override void Eat() { Console.WriteLine("Dog is eating!"); }
+        }
+        public class VectorizedList<T> : List<T> where T : notnull
+        {
+            public VectorizedList() : base() { }
+            public VectorizedList(IEnumerable<T> collection) : base(collection) { }
+            public VectorizedList(int capacity) : base(capacity) { }
+            public static VectorizedList<T> operator +(VectorizedList<T> list, T item)
+            {
+                VectorizedList<T> newList = new VectorizedList<T>(list);
+                for (int i = 0; i < list.Count; i++)
+                {
+                    newList[i] += (dynamic)item;
+                }
+                return newList;
+            }
+            public static VectorizedList<T> operator -(VectorizedList<T> list, T item)
+            {
+                VectorizedList<T> newList = new VectorizedList<T>(list);
+                for (int i = 0; i < list.Count; i++)
+                {
+                    newList[i] -= (dynamic)item;
+                }
+                return newList;
+            }
+            public static VectorizedList<T> operator *(VectorizedList<T> list, T item)
+            {
+                VectorizedList<T> newList = new VectorizedList<T>(list);
+                for (int i = 0; i < list.Count; i++)
+                {
+                    newList[i] *= (dynamic)item;
+                }
+                return newList;
+            }
+            public static VectorizedList<T> operator /(VectorizedList<T> list, T item)
+            {
+                VectorizedList<T> newList = new VectorizedList<T>(list);
+                for (int i = 0; i < list.Count; i++)
+                {
+                    newList[i] /= (dynamic)item;
+                }
+                return newList;
+            }
+        }
         public static void Inheritance()
         {
+            Console.WriteLine("Initiating animals...");
+            Animal animal = new Animal();
+            Dog dog = new Dog();
+            animal.Eat();
+            dog.Eat();
+            VectorizedList<float> vectorizedInts = new VectorizedList<float> { 1, 2, 3 };
+            Console.WriteLine("VectorizedInts: " + string.Join(", ", vectorizedInts));
+            VectorizedList<float> newVectorizedInts = vectorizedInts + 1;
+            Console.WriteLine("VectorizedInts after addition (unchanged, immutable addition): " + string.Join(", ", vectorizedInts));
+            Console.WriteLine("newVectorizedInts after addition: " + string.Join(", ", newVectorizedInts));
+            Console.WriteLine("newVectorizedInts after math expression: " + string.Join(", ", ((newVectorizedInts*2)+5)/3));
+
         }
         public static void Composition()
         {
@@ -330,6 +393,8 @@ namespace Learning.csharp
 
         public static void Main(string[] args)
         {
+            List<int> list = [ 1, 2, 3 ];
+
             RunWithDivider(
                 DataStructures,
                 ControlStructures,
@@ -338,7 +403,8 @@ namespace Learning.csharp
                 MethodSignatures,
                 Generics,
                 Yields,
-                PassByReference
+                PassByReference,
+                Inheritance
             );
 
         }
