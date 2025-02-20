@@ -101,7 +101,7 @@ namespace Learning.csharp
         {
             Console.WriteLine("Provide an integer to parse:");
             string userInput = Console.ReadLine() ?? "";
-            if (int.TryParse(userInput, out int tryInt))  // TODO: Learn how to use out keyword in custom methods
+            if (int.TryParse(userInput, out int tryInt))
             {
                 Console.WriteLine("Parsed int: " + tryInt);
                 string tryIntAsString = tryInt.ToString();
@@ -210,7 +210,7 @@ namespace Learning.csharp
         {
             TElement this[int index] { get; }
         }
-        public class GenericIndexClass<TCollection, TElement> where TCollection : IIndexable<TElement>
+        public class GenericIndexClass<TCollection, TElement> where TCollection : IReadOnlyList<TElement>
         {
             private readonly TCollection Items;
             public TElement GetItemAt(int Where)
@@ -226,13 +226,88 @@ namespace Learning.csharp
         {
             List<int> listOfInts = new List<int> { 1, 2, 3 };
             var genericIndexClass = new GenericIndexClass<List<int>, int>(listOfInts);
+            Console.WriteLine("GenericIndexClass at index 1 with List<int>: " + genericIndexClass.GetItemAt(1));
         }
         public static void Yields()
         {
+            static IEnumerable<int> FactorialGenerator(int n)
+            {
+                int result = 1;
+                for (int i = 1; i <= n; i++)
+                {
+                    result *= i;
+                    yield return result;
+                }
+            }
+            int factorialLimit = 5;
+            Console.WriteLine($"Factorial till {factorialLimit}:");
+            foreach (var (factorial, index) in FactorialGenerator(factorialLimit).Select((v,i) => (v,i)))
+            {
+                Console.WriteLine($"{index}! = {factorial}");
+            }
+        }
+        public struct LargeStruct
+        {
+            public int Field1;
+            public int Field2;
+            public int Field3;
+            public int Field4;
+            public int Field5;
+            public int Field6;
+            public int Field7;
+            public int Field8;
+            public int Field9;
+            public int Field10;
+
+            public Span<int> AsSpan() { return new Span<int>(new int[] { 
+                Field1,
+                Field2,
+                Field3,
+                Field4,
+                Field5,
+                Field6,
+                Field7,
+                Field8,
+                Field9,
+                Field10 
+            }); }
         }
         public static void PassByReference()
         {
-        
+            // out methods are actually pass by reference, and modify the out variable inplace
+            // in methods are pass by reference, but as readonly
+            // ref methods are pass by reference, and can modify the ref variable inplace
+            void increment(ref int value)
+            {
+                value++;
+            }
+            int value = 0;
+            Console.WriteLine($"Value before increment: {value}");
+            increment(ref value);
+            Console.WriteLine($"Value after increment {value}");
+            void printLargeStruct(in LargeStruct structInput)
+            {
+                int i = 1;
+                foreach (int structItem in structInput.AsSpan())
+                {
+                    Console.WriteLine($"Struct.Field{i}: {structItem}");
+                    i++;
+                }
+            }
+            LargeStruct largeStruct = new LargeStruct
+            {
+                Field1 = 1*3,
+                Field2 = 2*3,
+                Field3 = 3*3,
+                Field4 = 4*3,
+                Field5 = 5*3,
+                Field6 = 6*3,
+                Field7 = 7*3,
+                Field8 = 8*3,
+                Field9 = 9*3,
+                Field10 = 10*3 
+            };
+            printLargeStruct(largeStruct);
         }
         public static void Inheritance()
         {
@@ -245,7 +320,6 @@ namespace Learning.csharp
         }
         public static void Main(string[] args)
         {
-
             DataStructures();
             Console.WriteLine('\n'+new string('-', 50)+'\n');
             ControlStructures();
@@ -255,6 +329,13 @@ namespace Learning.csharp
             Classes();
             Console.WriteLine('\n' + new string('-', 50) + '\n');
             MethodSignatures();
+            Console.WriteLine('\n' + new string('-', 50) + '\n');
+            Generics();
+            Console.WriteLine('\n' + new string('-', 50) + '\n');
+            Yields();
+            Console.WriteLine('\n' + new string('-', 50) + '\n');
+            PassByReference();
+
         }
     }
 }
