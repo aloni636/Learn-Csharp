@@ -137,7 +137,82 @@ namespace Learning.csharp
                 Console.WriteLine("OutMethod returned false with outParam: " + outParam);
             }
         }
+        public class MyClass
+        {
+            private int _value;
+            private int _otherValue;
+            public MyClass(int value, int otherValue)
+            {
+                _value = value;
+                _otherValue = otherValue;
+            }
+            public MyClass() : this(0, 0) { Console.WriteLine("Initiating MyClass with default parameters..."); }
+            public int Value
+            { 
+                get { Console.WriteLine("Accessing MyClass.Value..."); return _value;  }
+                set { Console.WriteLine("Setting MyClass.Value...");  _value = value; }  
+            }
+            public int OtherValue{ get; set; }
+            public override string ToString()
+            {
+                return $"MyClass {{ {_value}, {_otherValue} }}";
+            }
+            public bool IsValid { get { return _value > _otherValue; } }
 
+        }
+        public static void Classes()
+        {
+            MyClass ClassInstance = new MyClass(1, 2);
+            Console.WriteLine($"ClassInstance is {ClassInstance}");
+            ClassInstance.OtherValue = 12;
+            Console.WriteLine($"Modified OtherValue to 12: {ClassInstance}");
+            ClassInstance.Value = 99;
+            Console.WriteLine($"ClassInstance is {ClassInstance}");
+            Console.WriteLine($"Printing MyClass.Value using get method {ClassInstance.Value}");
+            MyClass ClassInstanceDefault = new MyClass();
+            Console.WriteLine($"ClassInstanceDefault is {ClassInstanceDefault}");
+            Console.WriteLine($"Is ClassInstanceDefault valid? {ClassInstanceDefault.IsValid}");
+        }
+        //public static void Structs()
+        //{
+        //}
+        public static int SampleRandom()
+        {
+            return GlobalRandom.Next(0, 100);
+        }
+        public static int SampleRandom(int min, int max)
+        {
+            return GlobalRandom.Next(min, max);
+        }
+        public static char SampleRandom(string Text)
+        {
+            int textLength = Text.Length;
+            int randomIndex = GlobalRandom.Next(0, textLength);
+            return Text[randomIndex];
+        }
+        public static void MethodSignatures()
+        {
+            Console.WriteLine($"SampleRandom(): {SampleRandom()}");
+            Console.WriteLine($"SampleRandom(1,5): {SampleRandom(1,5)}");
+            Console.WriteLine($"SampleRandom(\"abcde\"): {SampleRandom("abcde")}");
+        }
+
+        public static void Yields()
+        {
+        }
+        public static void PassByReference()
+        {
+        
+        }
+        public static void Inheritance()
+        {
+        }
+        public static void Composition()
+        {
+        }
+        public static void DependencyInjection()
+        {
+        }
         public static void Main(string[] args)
         {
 
@@ -146,6 +221,10 @@ namespace Learning.csharp
             ControlStructures();
             Console.WriteLine('\n'+new string('-', 50)+'\n');
             Typecasting();
+            Console.WriteLine('\n'+new string('-', 50)+'\n');
+            Classes();
+            Console.WriteLine('\n' + new string('-', 50) + '\n');
+            MethodSignatures();
         }
     }
 }
