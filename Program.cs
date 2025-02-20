@@ -10,6 +10,9 @@ using System.IO;
 using System.Linq;  // Language-Integrated Query, allows SQL like expressions on linq enabled data structures
 using System.Data.Entity;
 using System.Security.Cryptography.X509Certificates;
+using System.Configuration;
+using System.Security.Policy;
+using static Learning.csharp.Program;
 
 namespace Learning.csharp
 {
@@ -158,6 +161,11 @@ namespace Learning.csharp
                 return $"MyClass {{ {_value}, {_otherValue} }}";
             }
             public bool IsValid { get { return _value > _otherValue; } }
+            public int this[int index]
+            {
+                get { return index == 0 ? _value : _otherValue; }
+                set { if (index == 0) _value = value; else _otherValue = value; }
+            }
 
         }
         public static void Classes()
@@ -172,6 +180,8 @@ namespace Learning.csharp
             MyClass ClassInstanceDefault = new MyClass();
             Console.WriteLine($"ClassInstanceDefault is {ClassInstanceDefault}");
             Console.WriteLine($"Is ClassInstanceDefault valid? {ClassInstanceDefault.IsValid}");
+            Console.WriteLine($"ClassInstanceDefault index at 0: {ClassInstanceDefault[0]}");
+            Console.WriteLine($"ClassInstanceDefault index at 1: {ClassInstanceDefault[1]}");
         }
         //public static void Structs()
         //{
@@ -196,7 +206,27 @@ namespace Learning.csharp
             Console.WriteLine($"SampleRandom(1,5): {SampleRandom(1,5)}");
             Console.WriteLine($"SampleRandom(\"abcde\"): {SampleRandom("abcde")}");
         }
-
+        public interface IIndexable<TElement>
+        {
+            TElement this[int index] { get; }
+        }
+        public class GenericIndexClass<TCollection, TElement> where TCollection : IIndexable<TElement>
+        {
+            private readonly TCollection Items;
+            public TElement GetItemAt(int Where)
+            {
+                return Items[Where];
+            }
+            public GenericIndexClass(TCollection items)
+            {
+                Items = items;
+            }
+        }
+        public static void Generics()
+        {
+            List<int> listOfInts = new List<int> { 1, 2, 3 };
+            var genericIndexClass = new GenericIndexClass<List<int>, int>(listOfInts);
+        }
         public static void Yields()
         {
         }
