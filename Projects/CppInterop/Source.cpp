@@ -9,29 +9,52 @@
 #include <memory>  // for smart pointers
 #include <random>  // for std::mt19937
 
-// splitString function
+// NOTE: not working...
+std::vector<std::string> splitString(std::string delimitedString, std::string delimiter) {
+	std::vector<std::string> tokens;
+
+	int previousPosition = 0;
+	int currentPosition = 0;
+	while (true) {
+		currentPosition = delimitedString.find(delimiter, previousPosition);
+		if (currentPosition == std::string::npos) break;
+		tokens.push_back(
+			delimitedString.substr(previousPosition, currentPosition)
+		);
+		previousPosition = currentPosition;
+
+	};
+	// std::getline cannot support string delimiter, only char, so no.
+	//while (std::getline(stream, token, 's'))
+	return tokens;
+}
 
 // Use templates for printing arrays vecs etc
 std::string joinStrings(const std::string a, const std::string b) {
 	return a + ", " + b;
 }
 
-//void binaryTree() {
-//	// === Structs ===
-//	struct Node {
-//		int data;
-//		Node* left;
-//		Node* right;
-//
-//		Node(int value) : data(value), left(nullptr), right(nullptr) {}
-//		~Node() {
-//			delete left;
-//			delete right;
-//		}
-//	};
-//	std::unique_ptr<Node> root = std::make_unique<Node>(10);
-//	std::mt19937 gen(42)
-//}
+void binaryTree() {
+	// === Structs ===
+	struct Node {
+		int data;
+		Node* left;
+		Node* right;
+
+		Node(int value) : data(value), left(nullptr), right(nullptr) {}
+		~Node() {
+			delete left;
+			delete right;
+		}
+	};
+	std::unique_ptr<Node> root = std::make_unique<Node>(10);
+	std::mt19937 rngEngine(42);  // defining rng engine
+	std::uniform_int_distribution<int> randomDistribution(1, 100);  // init for config object which passes requirements to an rng engine
+	int randomNumber = randomDistribution(rngEngine);  // passing config to rng engine
+	/*for (int i = 1; i < 12; i++) {
+		root
+	}*/
+}
 
 void dataStructures() {
 	// int, floats, doubles, bools, string
@@ -67,6 +90,8 @@ void dataStructures() {
 	std::cout << "I can split strings by ',' delimiter:\n";
 	std::string inputDelimitedString;
 	std::cin >> inputDelimitedString;
+	auto tokens = splitString(inputDelimitedString, ", ");
+	for (std::string token : tokens) { std::cout << token; };  // for each loop
 	// TODO: split by delimiter using std::getline, and store in composite vec
 	//std::string word 
 
@@ -82,12 +107,19 @@ void dataStructures() {
 	// === Vectors ===
 	std::vector<std::string> stringVec = { "One is", "Two but", "Four is one?!" };
 	std::cout << "stringVec: {" << std::accumulate(stringVec.begin(), stringVec.end(), stringVec[0], joinStrings) << "}";
+	std::cout << "stringVec (again): {" << std::accumulate(
+		stringVec.begin(),
+		stringVec.end(),
+		stringVec[0],
+		[](std::string a, std::string b) {return a + ", " + b;}  // lambda function
+	) << "}";
 
 
 	// === structs ===
 	struct CreditCard {
 		int useCount;
 		int cardNumber;
+		// add overloaded printing << 
 	};
 
 	struct Person {
@@ -112,7 +144,10 @@ void dataStructures() {
 
 void pointers() {}
 
-void controlStructures() {}
+void functions() {
+	// TODO: named parameters (not possible)
+}
+void controlStructures() {}  // including exceptions
 
 void preprocessorDirectives() {}  // make cross platfrom getTerminalWidth
 
