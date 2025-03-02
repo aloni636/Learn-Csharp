@@ -1,22 +1,62 @@
 #include <iostream>
+#include <bitset>
+#include <sstream>  // for std::stringstream 
+#include <windows.h>  // for GetConsoleScreenBufferInfo
+#include <algorithm>  // for std::min & std::max
 
-void data_structures() {
+void dataStructures() {
+	// int, floats, doubles, bools, string
+	// convention is camelCase for funcs and variables 
 	int integer = 1;
-	float floating_number = 1.1;
-	double double_precision_number = 1.2455;
-	//std:: floating_number  // TODO: print hex representation
-	std::cout << "Hello world from C++!"
-		<< "\ninteger: " << integer << " hex: " << std::hex << integer;
-	std::cout << "\nfloating number: " << floating_number << " hex: " << std::hexfloat << floating_number;
-	std::cout << "\ndouble precision number: " << double_precision_number << " hex: " << std::hexfloat << double_precision_number;
+	float floatingNumber = 1.1;
+	double doublePrecisionNumber = 1.2455;
+	bool flag;
+	flag = integer == 5;
+	std::string stringVariable = "hello world";
+	char C = 'C', p = '+';
+	std::string cpp;
+	cpp = cpp + C + p + p;
+
+	std::stringstream stream;
+	stream << stringVariable << " from " << cpp << "!";
+
+	std::string streamString = stream.str();
+
+	int streamLength = streamString.length();
+	std::cout << streamString;
+	std::cout << "\n^" << std::string(
+		std::max<std::size_t>(0, streamString.length() - std::to_string(streamLength).length() - 3),
+		'-'
+	) << " " << std::to_string(streamLength) << "\n";
+
+	CONSOLE_SCREEN_BUFFER_INFO csbi;
+	GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi);
+	int consoleWidth = csbi.srWindow.Right - csbi.srWindow.Left + 1;
+
+	std::cout << "\n" << std::string(consoleWidth, '-') << "\n";
+	// composites: arrays, vectors, structs
+	
+	// TODO: print hex representation
+	std::cout << "\ninteger: " << integer << " hex: " << std::hex << integer << std::dec;
+	// TODO: make hex repr make sense
+	std::cout << "\nfloating number: " << floatingNumber << " hex: " << std::hex << *reinterpret_cast<unsigned int*>(&floatingNumber) << std::dec;
+	std::cout << "\ndouble precision number: " << doublePrecisionNumber << " hex: " << std::hex << *reinterpret_cast<unsigned int*>(&doublePrecisionNumber) << std::dec;
 	std::cout << "\n";
+
+	
 }
 
-void control_structures() {
+//void printSeparator() {
+//
+//}
 
-}
+void pointers() {}
+
+void controlStructures() {}
+
+void preprocessorDirectives() {}  // make cross platfrom getTerminalWidth
 
 int main(int argc, char** argv) {
-	data_structures();
+	dataStructures();
 	return 0;
 }
