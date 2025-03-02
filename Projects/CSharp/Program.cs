@@ -320,6 +320,7 @@ namespace Learning.csharp
         }
         public class VectorizedList<T> : List<T> where T : notnull
         {
+            // Inheritance cannot transfer construction methods , so we need to define them again
             public VectorizedList() : base() { }
             public VectorizedList(IEnumerable<T> collection) : base(collection) { }
             public VectorizedList(int capacity) : base(capacity) { }
@@ -373,7 +374,6 @@ namespace Learning.csharp
             Console.WriteLine("VectorizedInts after addition (unchanged, immutable addition): " + string.Join(", ", vectorizedInts));
             Console.WriteLine("newVectorizedInts after addition: " + string.Join(", ", newVectorizedInts));
             Console.WriteLine("newVectorizedInts after math expression: " + string.Join(", ", ((newVectorizedInts*2)+5)/3));
-
         }
         public static void Composition()
         {
