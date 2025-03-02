@@ -10,18 +10,17 @@
 #include <random>  // for std::mt19937
 
 // NOTE: not working...
-std::vector<std::string> splitString(std::string delimitedString, std::string delimiter) {
+std::vector<std::string> splitString(const std::string& delimitedString, const std::string& delimiter) {
 	std::vector<std::string> tokens;
+    size_t previousPosition = 0;
+    size_t currentPosition = 0;
 
-	int previousPosition = 0;
-	int currentPosition = 0;
-	while (true) {
-		currentPosition = delimitedString.find(delimiter, previousPosition);
-		if (currentPosition == std::string::npos) break;
-		tokens.push_back(
-			delimitedString.substr(previousPosition, currentPosition)
-		);
-		previousPosition = currentPosition;
+    while ((currentPosition = delimitedString.find(delimiter, previousPosition)) != std::string::npos) {
+        tokens.push_back(delimitedString.substr(previousPosition, currentPosition - previousPosition));
+        previousPosition = currentPosition + delimiter.length();
+    }
+    // Push the last token (if any)
+    tokens.push_back(delimitedString.substr(previousPosition));
 
 	};
 	// std::getline cannot support string delimiter, only char, so no.
