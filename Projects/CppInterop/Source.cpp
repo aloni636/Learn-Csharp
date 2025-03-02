@@ -3,6 +3,35 @@
 #include <sstream>  // for std::stringstream 
 #include <windows.h>  // for GetConsoleScreenBufferInfo
 #include <algorithm>  // for std::min & std::max
+#include <array>
+#include <vector>
+#include <numeric>  // for recude
+#include <memory>  // for smart pointers
+#include <random>  // for std::mt19937
+
+// splitString function
+
+// Use templates for printing arrays vecs etc
+std::string joinStrings(const std::string a, const std::string b) {
+	return a + ", " + b;
+}
+
+//void binaryTree() {
+//	// === Structs ===
+//	struct Node {
+//		int data;
+//		Node* left;
+//		Node* right;
+//
+//		Node(int value) : data(value), left(nullptr), right(nullptr) {}
+//		~Node() {
+//			delete left;
+//			delete right;
+//		}
+//	};
+//	std::unique_ptr<Node> root = std::make_unique<Node>(10);
+//	std::mt19937 gen(42)
+//}
 
 void dataStructures() {
 	// int, floats, doubles, bools, string
@@ -34,8 +63,39 @@ void dataStructures() {
 	int consoleWidth = csbi.srWindow.Right - csbi.srWindow.Left + 1;
 
 	std::cout << "\n" << std::string(consoleWidth, '-') << "\n";
+
+	std::cout << "I can split strings by ',' delimiter:\n";
+	std::string inputDelimitedString;
+	std::cin >> inputDelimitedString;
+	// TODO: split by delimiter using std::getline, and store in composite vec
+	//std::string word 
+
 	// composites: arrays, vectors, structs
-	
+	// === Arrays ===
+	std::array<int, 5> intArray = { 1,2,3,4,5 };
+	std::stringstream intArrayStream;
+	intArrayStream << "Array of ints: { ";
+	for (int num : intArray) { intArrayStream << num << ", "; };
+	intArrayStream << "}\n";
+	std::cout << intArrayStream.str();
+
+	// === Vectors ===
+	std::vector<std::string> stringVec = { "One is", "Two but", "Four is one?!" };
+	std::cout << "stringVec: {" << std::accumulate(stringVec.begin(), stringVec.end(), stringVec[0], joinStrings) << "}";
+
+
+	// === structs ===
+	struct CreditCard {
+		int useCount;
+		int cardNumber;
+	};
+
+	struct Person {
+		std::string name;
+		CreditCard* card;
+	};
+
+
 	// TODO: print hex representation
 	std::cout << "\ninteger: " << integer << " hex: " << std::hex << integer << std::dec;
 	// TODO: make hex repr make sense
