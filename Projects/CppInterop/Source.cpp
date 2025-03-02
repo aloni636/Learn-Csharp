@@ -141,7 +141,24 @@ void dataStructures() {
 //
 //}
 
-void pointers() {}
+void pointers() {
+	// === refs ===
+	std::string pizza = "🍕";
+	std::string& samePizza = pizza;
+	std::string pizzaCopy = pizza;
+	pizza.at(0) = '⌚';
+	std::cout << "original pizza: " << pizza << "\n";
+	std::cout << "pizza reference: " << samePizza << "\n";
+	std::cout << "pizza copy: " << pizzaCopy << "\n";
+	
+	std::cout << "pizza address: " << &pizzaCopy << "\n";
+	
+	std::string* pizzaPointer = &pizza;
+	std::cout << "pizza pointer: " << pizzaPointer << "\n";
+	std::cout << "pizza derefrence: " << *pizzaPointer << "\n";
+	*pizzaPointer = "🍕";
+	std::cout << "pizza derefrence after making it pizza again: " << *pizzaPointer << "\n";
+}
 
 void functions() {
 	// TODO: named parameters (not possible)
@@ -151,6 +168,8 @@ void controlStructures() {}  // including exceptions
 void preprocessorDirectives() {}  // make cross platfrom getTerminalWidth
 
 int main(int argc, char** argv) {
+	SetConsoleOutputCP(CP_UTF8);
 	dataStructures();
+	pointers();
 	return 0;
 }
