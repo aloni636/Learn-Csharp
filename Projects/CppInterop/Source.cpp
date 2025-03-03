@@ -57,7 +57,7 @@ void dataStructures() {
 	// int, floats, doubles, bools, string
 	// convention is camelCase for funcs and variables 
 	int integer = 1;
-	float floatingNumber = 1.1;
+	float floatingNumber = 1.1f;
 	double doublePrecisionNumber = 1.2455;
 	bool flag;
 	flag = integer == 5;
@@ -71,7 +71,7 @@ void dataStructures() {
 
 	std::string streamString = stream.str();
 
-	int streamLength = streamString.length();
+	size_t streamLength = streamString.length();
 	std::cout << streamString;
 	std::cout << "\n^" << std::string(
 		std::max<std::size_t>(0, streamString.length() - std::to_string(streamLength).length() - 3),
@@ -146,7 +146,9 @@ void pointers() {
 	std::string pizza = "🍕";
 	std::string& samePizza = pizza;
 	std::string pizzaCopy = pizza;
-	pizza.at(0) = '⌚';
+	// #pragma warning(suppress: 4305 4309)
+	// occurred because '⌚' is a multi byte unicode, but got truncated to fit into a byte which overrides the first byte of the pizza
+	pizza.at(0) = '\xFF';
 	std::cout << "original pizza: " << pizza << "\n";
 	std::cout << "pizza reference: " << samePizza << "\n";
 	std::cout << "pizza copy: " << pizzaCopy << "\n";
