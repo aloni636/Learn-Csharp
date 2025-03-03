@@ -1,3 +1,4 @@
+#define NOMINMAX  // avoid conflic with std::numeric_limits<float>::max()
 #include <iostream>
 #include <bitset>
 #include <sstream>  // for std::stringstream 
@@ -8,7 +9,8 @@
 #include <numeric>  // for recude
 #include <memory>  // for smart pointers
 #include <random>  // for std::mt19937
-#include <map>
+#include <map>  // for tree stuff
+#include <limits>
 
 // NOTE: not working...
 std::vector<std::string> splitString(const std::string& delimitedString, const std::string& delimiter) {
@@ -60,7 +62,7 @@ public:
 		int maxLevelLeft = 0, maxLevelRight = 0;
 		if (left != nullptr) { maxLevelLeft = (*left).maxTreeDepth(currentLevel + 1); }
 		if (right != nullptr) { maxLevelRight = (*right).maxTreeDepth(currentLevel + 1); }
-		return max(maxLevelLeft, maxLevelRight);
+		return std::max(maxLevelLeft, maxLevelRight);
 	};
 	/*void printNode() {
 		_printNode(0);
@@ -169,9 +171,32 @@ void dataStructures() {
 	std::cout << "\nfloating number: " << floatingNumber << " hex: " << std::hex << *reinterpret_cast<unsigned int*>(&floatingNumber) << std::dec;
 	std::cout << "\ndouble precision number: " << doublePrecisionNumber << " hex: " << std::hex << *reinterpret_cast<unsigned int*>(&doublePrecisionNumber) << std::dec;
 	std::cout << "\n";
-	// TODO: 3. learn about static_cast & reinterpret_cast
-
 	
+	// TODO: 3. (DONE) learn about static_cast & reinterpret_cast
+	// Type safe casting using `static_cast`
+	float int32MaxAsFloat = static_cast<float>(INT32_MAX);
+	std::cout << "I made max int32 as float: " << int32MaxAsFloat << "\n";
+	float maxFloat32 = std::numeric_limits<float>::max();
+	double maxFloat32AsDouble = static_cast<double>(maxFloat32);
+	std::cout << "I made max float32 as double: " << maxFloat32AsDouble << "\n";
+	
+	char32_t unicodeCharacter = '🤩';
+	int32_t unicodeCharacterAsInt32 = static_cast<int32_t>(unicodeCharacter);
+	std::cout << "I made unicode as int32: " << unicodeCharacterAsInt32 << "\n";
+
+	// Unsafe casting
+	// std::string unicodeString = "🤩";
+	// int32_t* unicodeStringAsInt32Pointer = reinterpret_cast<int32_t*>(unicodeString);
+	float floatingPointNumber = 3.1415f;
+
+	// Reinterpret the float's bits as an unsigned int
+	unsigned int floatBits = *reinterpret_cast<unsigned int*>(&floatingPointNumber);
+	std::cout << "Float: " << floatingPointNumber << " Hex: 0x" << std::hex << floatBits << std::dec << "\n";
+
+	// Reinterpret as void pointer
+	void* floatingPointNumberAsVoidPointer = reinterpret_cast<void*>(&floatingPointNumber);
+    constexpr float maxFloat32 = std::numeric_limits<float>::max();
+	std::cout << "Floating point number as void pointer casted to int pointer: " << *reinterpret_cast<int32_t*>(floatingPointNumberAsVoidPointer) << "\n";
 }
 
 //void printSeparator() {
@@ -198,7 +223,7 @@ void pointers() {
 	*pizzaPointer = "🍕";
 	std::cout << "pizza dereference after making it pizza again: " << *pizzaPointer << "\n";
 
-	// TODO (DONE): 1. RAII unique_ptr & shared_ptr
+	// TODO 1. (DONE): RAII unique_ptr & shared_ptr
 	std::unique_ptr<std::string> pizzaUniquePointer = std::make_unique<std::string>(pizza);
 	std::cout << "pizza unique pointer dereference: " << *pizzaUniquePointer << "\n";
 	*pizzaUniquePointer = "🚤";
