@@ -11,7 +11,7 @@
 
 // NOTE: not working...
 std::vector<std::string> splitString(const std::string& delimitedString, const std::string& delimiter) {
-	std::vector<std::string> tokens;
+    std::vector<std::string> tokens;
     size_t previousPosition = 0;
     size_t currentPosition = 0;
 
@@ -21,11 +21,8 @@ std::vector<std::string> splitString(const std::string& delimitedString, const s
     }
     // Push the last token (if any)
     tokens.push_back(delimitedString.substr(previousPosition));
-
-	};
-	// std::getline cannot support string delimiter, only char, so no.
-	//while (std::getline(stream, token, 's'))
-	return tokens;
+    
+    return tokens;
 }
 
 // Use templates for printing arrays vecs etc
@@ -86,11 +83,12 @@ void dataStructures() {
 
 	std::cout << "\n" << std::string(consoleWidth, '-') << "\n";
 
-	std::cout << "I can split strings by ',' delimiter:\n";
+	std::cout << "I can split strings by '|' delimiter:\n";
 	std::string inputDelimitedString;
 	std::cin >> inputDelimitedString;
-	auto tokens = splitString(inputDelimitedString, ", ");
-	for (std::string token : tokens) { std::cout << token; };  // for each loop
+	auto stringTokens = splitString(inputDelimitedString, "|");
+	for (std::string token : stringTokens) { std::cout << token << ", "; };  // for each loop
+	std::cout << "\n";
 	// TODO: split by delimiter using std::getline, and store in composite vec
 	//std::string word 
 
@@ -105,8 +103,8 @@ void dataStructures() {
 
 	// === Vectors ===
 	std::vector<std::string> stringVec = { "One is", "Two but", "Four is one?!" };
-	std::cout << "stringVec: {" << std::accumulate(stringVec.begin(), stringVec.end(), stringVec[0], joinStrings) << "}";
-	std::cout << "stringVec (again): {" << std::accumulate(
+	std::cout << "\nstringVec: {" << std::accumulate(stringVec.begin(), stringVec.end(), stringVec[0], joinStrings) << "}";
+	std::cout << "\nstringVec (again): {" << std::accumulate(
 		stringVec.begin(),
 		stringVec.end(),
 		stringVec[0],
@@ -160,7 +158,20 @@ void pointers() {
 	std::cout << "pizza derefrence after making it pizza again: " << *pizzaPointer << "\n";
 }
 
+// cannot be declared inside a function...
+// optional params
+void printMulti(std::string source, int count) {
+	for (int i = 0; i < count; i++) {
+		std::cout << source << "\n";
+	};
+};
+void printMulti(std::string source) { printMulti(source, 1); };
+
 void functions() {
+	std::cout << "\nprintMulti(\"hello\", 2):\n";
+	printMulti("hello", 2);
+	std::cout << "printMulti(\"hello\"):\n";
+	printMulti("hello");
 	// TODO: named parameters (not possible)
 }
 void controlStructures() {}  // including exceptions
@@ -171,5 +182,6 @@ int main(int argc, char** argv) {
 	SetConsoleOutputCP(CP_UTF8);
 	dataStructures();
 	pointers();
+	functions();
 	return 0;
 }
