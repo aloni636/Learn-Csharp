@@ -157,11 +157,37 @@ void pointers() {
 	
 	std::string* pizzaPointer = &pizza;
 	std::cout << "pizza pointer: " << pizzaPointer << "\n";
-	std::cout << "pizza derefrence: " << *pizzaPointer << "\n";
+	std::cout << "pizza dereference: " << *pizzaPointer << "\n";
 	*pizzaPointer = "🍕";
-	std::cout << "pizza derefrence after making it pizza again: " << *pizzaPointer << "\n";
+	std::cout << "pizza dereference after making it pizza again: " << *pizzaPointer << "\n";
 
-	// TODO: 1. RAII unique_ptr & shared_ptr
+	// TODO (DONE): 1. RAII unique_ptr & shared_ptr
+	std::unique_ptr<std::string> pizzaUniquePointer = std::make_unique<std::string>(pizza);
+	std::cout << "pizza unique pointer dereference: " << *pizzaUniquePointer << "\n";
+	*pizzaUniquePointer = "🚤";
+	std::cout << "pizza unique pointer dereference after conversion to boat: " << *pizzaUniquePointer << "\n";
+	
+	// RAII: no valid conversion from string unique_ptr to regular string ptr
+	// In this case, RAII is enforced at the type level
+	// std::string* anotherPizzaPointer = pizzaUniquePointer;
+	// RAII: unique_ptr is a deleted function, which is RAII enforced at compile time (I think...)
+	// std::unique_ptr<std::string> anotherPizzaUniquePointer = pizzaUniquePointer;
+	std::unique_ptr<std::string> anotherPizzaUniquePointer = std::move(pizzaUniquePointer);
+	//std::cout << "pizzaUniquePointer after std::move: " << pizzaUniquePointer << "\n";  // 
+	//std::cout << "dereferencing pizzaUniquePointer after std::move: " << *pizzaUniquePointer << "\n";  // crash
+	std::shared_ptr<std::string> sharedPizzaUniquePointer = std::make_shared<std::string>(pizza);
+	std::shared_ptr<std::string> anotherSharedPizzaUniquePointer = sharedPizzaUniquePointer;  // this works
+	std::cout << "pizza shared pointer dereference (1): " << *sharedPizzaUniquePointer << "\n";
+	std::cout << "pizza shared pointer dereference (2): " << *anotherSharedPizzaUniquePointer << "\n";
+	std::cout << "shared pizza pointers count (1): " << sharedPizzaUniquePointer.use_count() << "\n";
+	std::cout << "shared pizza pointers count (2): " << anotherSharedPizzaUniquePointer.use_count() << "\n";
+	std::cout << "buckle your seatbelts, boys, were entering a local scope!\n";
+	{
+		std::shared_ptr<std::string> localSharedPizzaUniquePointer = sharedPizzaUniquePointer;
+		std::cout << "shared pizza pointers count (1): " << sharedPizzaUniquePointer.use_count() << "\n";
+	}
+	std::cout << "relax, boys! we've existed local scope!\n";
+	std::cout << "shared pizza pointers count after exiting local scope (1): " << sharedPizzaUniquePointer.use_count() << "\n";
 }
 
 // cannot be declared inside a function...
