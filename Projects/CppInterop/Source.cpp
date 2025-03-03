@@ -8,6 +8,7 @@
 #include <numeric>  // for recude
 #include <memory>  // for smart pointers
 #include <random>  // for std::mt19937
+#include <map>
 
 // NOTE: not working...
 std::vector<std::string> splitString(const std::string& delimitedString, const std::string& delimiter) {
@@ -29,6 +30,42 @@ std::vector<std::string> splitString(const std::string& delimitedString, const s
 std::string joinStrings(const std::string a, const std::string b) {
 	return a + ", " + b;
 }
+
+
+// Maybe later...
+class Node {
+public:
+	int data;
+	std::unique_ptr<Node> left;
+	std::unique_ptr<Node> right;
+	bool isLeaf() const {
+		return (left == nullptr) and (right == nullptr);
+	};
+	void populateLevelStrings(std::map<int, std::string>& levels, int currentDepth, int treeDepth) {
+		//                1  
+		//         3            2
+		//    4         5
+		//  6   7   6
+		//      
+		int level = treeDepth - currentDepth;
+		level;
+		//(*left).populateLevelStrings();
+	};
+	int maxTreeDepth(int currentLevel = 0) const {
+		// base case
+		if ((left == nullptr) and (right == nullptr)) {
+			return currentLevel;
+		};
+		// recursive case
+		int maxLevelLeft = 0, maxLevelRight = 0;
+		if (left != nullptr) { maxLevelLeft = (*left).maxTreeDepth(currentLevel + 1); }
+		if (right != nullptr) { maxLevelRight = (*right).maxTreeDepth(currentLevel + 1); }
+		return max(maxLevelLeft, maxLevelRight);
+	};
+	/*void printNode() {
+		_printNode(0);
+	}*/;
+};
 
 void binaryTree() {
 	// === Structs ===
