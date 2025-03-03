@@ -13,6 +13,9 @@
 #include <limits>  // for casting at the limits
 #include <fstream>  // for file streams
 #include <stdexcept>  // for std::runtime_error
+#include <regex>  // for string subsitution in log class
+#include <ctime>  // for taking current time
+#include <iomanip>  // for converting time to string
 
 // NOTE: not working...
 std::vector<std::string> splitString(const std::string& delimitedString, const std::string& delimiter) {
@@ -264,7 +267,7 @@ void printMulti(std::string source) { printMulti(source, 1); };
 
 // TODO: 7. Recursive triangle print
 
-// TODO: 4. Classes (constructors, destructors, member functions)
+// TODO: 4. (DONE) Classes (constructors, destructors, member functions)
 
 class RandomLinePicker {
 private:
@@ -330,6 +333,79 @@ void classes() {
 }
 // TODO: 5. Inheritance, virtual functions, and polymorphism
 
+class AbstractLogger {
+protected:
+	std::string format = "{time} {message}";
+	std::string formatMessage(std::string message) {
+		std::string outMessage = format;  // copy
+		std::time_t currentTime = std::time(nullptr);
+		std::tm localTime;
+		::localtime_s(&localTime, &currentTime);  // extrernal C library, not in std
+		
+		std::ostringstream oss;
+		oss << std::put_time(&localTime, "%Y-%m-%d %H:%M:%S");
+		std::string localTimeString = oss.str();
+
+		outMessage = std::regex_replace(outMessage, std::regex(R"(\{time\})"), localTimeString);
+		outMessage = std::regex_replace(outMessage, std::regex(R"(\{message\})"), message);
+		return outMessage;
+	}
+public:
+	virtual void log(std::string message) = 0;  // pure virtual function, i.e. abstract method
+	virtual void logMultiple(std::vector<std::string> messages) {
+		for (std::string message : messages) {
+			log(message);
+		}
+	};
+	void setFormat(const std::string newFormat) {
+		format = newFormat;
+	}
+	virtual ~AbstractLogger() = default;
+};
+
+
+class ConsoleLogger : public AbstractLogger {  // `public` is used because default behavior is private, which means I cannot access any virtual method
+public:
+	void log(std::string message) override {  // override must not be omitted to prevent the compiler to treat this as overloading with different signature
+		std::cout << formatMessage(message);
+	}
+};
+
+
+class FileLogger : public AbstractLogger {
+private:
+	std::string filePath;
+public:
+	FileLogger(std::string logPath) : filePath(logPath) {
+		filePath = logPath;
+	}
+
+	void log(std::string message) override {
+		std::ofstream file(filePath, std::ios::app);  // append mode
+		if (!file.is_open()) {
+			throw std::runtime_error("couldn't open log file at " + filePath);
+		};
+		file << formatMessage(message) << "\n";
+		file.close();
+	};
+	void logMultiple(std::vector<std::string> messages) {
+		std::ofstream file(filePath);
+		if (!file.is_open()) {
+			throw std::runtime_error("couldn't open log file at " + filePath);
+		};
+		for (std::string message : messages) {
+			file << formatMessage(message) << "\n";
+		}
+		file.close();
+	}
+};
+void inheritance() {
+	ConsoleLogger consoleLogger{};  // {} Uniform Initialization, resolves ambiguity with function definition
+	FileLogger fileLogger{ "./cpp_log.txt" };
+	consoleLogger.log("hello world from logger!");
+	fileLogger.log("I was just written to the file system!");
+}
+
 // TODO: 6. Templates
 
 void functions() {
@@ -348,5 +424,6 @@ int main(int argc, char** argv) {
 	pointers();
 	functions();
 	classes();
+	inheritance();
 	return 0;
 }
