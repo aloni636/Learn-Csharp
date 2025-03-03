@@ -43,6 +43,7 @@ void binaryTree() {
 			delete right;
 		}
 	};
+	// TODO: 2. learn more about new, delete, unique_ptr and shared_ptr
 	std::unique_ptr<Node> root = std::make_unique<Node>(10);
 	std::mt19937 rngEngine(42);  // defining rng engine
 	std::uniform_int_distribution<int> randomDistribution(1, 100);  // init for config object which passes requirements to an rng engine
@@ -89,8 +90,8 @@ void dataStructures() {
 	auto stringTokens = splitString(inputDelimitedString, "|");
 	for (std::string token : stringTokens) { std::cout << token << ", "; };  // for each loop
 	std::cout << "\n";
-	// TODO: split by delimiter using std::getline, and store in composite vec
-	//std::string word 
+	// TODO: 8. split by delimiter using std::getline, and store in composite vec
+	// std::string word 
 
 	// composites: arrays, vectors, structs
 	// === Arrays ===
@@ -125,12 +126,13 @@ void dataStructures() {
 	};
 
 
-	// TODO: print hex representation
+	// TODO: 10. print hex representation
 	std::cout << "\ninteger: " << integer << " hex: " << std::hex << integer << std::dec;
-	// TODO: make hex repr make sense
+	// TODO: 9. make hex repr make sense
 	std::cout << "\nfloating number: " << floatingNumber << " hex: " << std::hex << *reinterpret_cast<unsigned int*>(&floatingNumber) << std::dec;
 	std::cout << "\ndouble precision number: " << doublePrecisionNumber << " hex: " << std::hex << *reinterpret_cast<unsigned int*>(&doublePrecisionNumber) << std::dec;
 	std::cout << "\n";
+	// TODO: 3. learn about static_cast & reinterpret_cast
 
 	
 }
@@ -156,6 +158,8 @@ void pointers() {
 	std::cout << "pizza derefrence: " << *pizzaPointer << "\n";
 	*pizzaPointer = "🍕";
 	std::cout << "pizza derefrence after making it pizza again: " << *pizzaPointer << "\n";
+
+	// TODO: 1. RAII unique_ptr & shared_ptr
 }
 
 // cannot be declared inside a function...
@@ -167,12 +171,19 @@ void printMulti(std::string source, int count) {
 };
 void printMulti(std::string source) { printMulti(source, 1); };
 
+// TODO: 7. Recursive triangle print
+
+// TODO: 4. Classes (constructors, destructors, member functions)
+
+// TODO: 5. Inheritance, virtual functions, and polymorphism
+
+// TODO: 6. Templates
+
 void functions() {
 	std::cout << "\nprintMulti(\"hello\", 2):\n";
 	printMulti("hello", 2);
 	std::cout << "printMulti(\"hello\"):\n";
 	printMulti("hello");
-	// TODO: named parameters (not possible)
 }
 void controlStructures() {}  // including exceptions
 
