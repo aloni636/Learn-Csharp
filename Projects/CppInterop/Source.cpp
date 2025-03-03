@@ -10,7 +10,9 @@
 #include <memory>  // for smart pointers
 #include <random>  // for std::mt19937
 #include <map>  // for tree stuff
-#include <limits>
+#include <limits>  // for casting at the limits
+#include <fstream>  // for file streams
+#include <stdexcept>  // for std::runtime_error
 
 // NOTE: not working...
 std::vector<std::string> splitString(const std::string& delimitedString, const std::string& delimiter) {
@@ -195,7 +197,6 @@ void dataStructures() {
 
 	// Reinterpret as void pointer
 	void* floatingPointNumberAsVoidPointer = reinterpret_cast<void*>(&floatingPointNumber);
-    constexpr float maxFloat32 = std::numeric_limits<float>::max();
 	std::cout << "Floating point number as void pointer casted to int pointer: " << *reinterpret_cast<int32_t*>(floatingPointNumberAsVoidPointer) << "\n";
 }
 
@@ -265,6 +266,68 @@ void printMulti(std::string source) { printMulti(source, 1); };
 
 // TODO: 4. Classes (constructors, destructors, member functions)
 
+class RandomLinePicker {
+private:
+	std::string csvPath;
+	std::mt19937 rngEngine;
+	std::uniform_int_distribution<int> csvRandomDistribution;  // init for config object which passes requirements to an rng engine
+	std::vector<std::string> lines;
+
+public:
+	RandomLinePicker(std::string csvPath) {
+		std::random_device rd;
+		*this = RandomLinePicker(csvPath, rd());
+	}
+
+	RandomLinePicker(std::string csvPath, int seed) {
+		std::ifstream file(csvPath);
+		if (!file.is_open()) {
+			throw std::runtime_error("cannot open file: " + csvPath);
+		}
+		std::string line;
+		while (std::getline(file, line, '\n')) {
+			lines.push_back(line);
+		}
+		rngEngine = std::mt19937(seed);
+		csvRandomDistribution = std::uniform_int_distribution<int>(0, static_cast<int>(lines.size() - 1));
+	}
+	std::string pickOne() {
+		int randomIndex = csvRandomDistribution(rngEngine);
+		return lines[randomIndex];
+	}
+	std::vector < std::string> pickMany(int count) {
+		std::vector<std::string> out(count);
+		for (int i = 0; i < count; i++) {
+			int randomIndex = csvRandomDistribution(rngEngine);
+			out[i] = lines[randomIndex];
+		}
+		return out;
+	}
+};
+
+template <typename T> std::string vecToString(std::vector<T> vec, std::string delimiter = ", ") {
+	if (vec.size() == 0) {
+		return "";
+	}
+	std::vector<std::string> vecString = std::vector<std::string>(vec.size());
+	for (int i = 0; i < vec.size(); i++) {
+		vecString[i] = static_cast<std::string>(vec[i]);
+	}
+	std::string concatenatedVec = std::accumulate(
+		vecString.begin(),
+		vecString.end(),
+		vecString[0],
+		[delimiter](std::string a, std::string b) {return a + delimiter + b;}  // lambda function
+	);
+	return "{" + concatenatedVec + "}";
+}
+
+void classes() {
+	RandomLinePicker linePicker = RandomLinePicker("./words.csv");
+	std::cout << "random word from csv: " << linePicker.pickOne() << "\n";
+	std::cout << "random word from csv: " << vecToString(linePicker.pickMany(5)) << "\n";
+
+}
 // TODO: 5. Inheritance, virtual functions, and polymorphism
 
 // TODO: 6. Templates
@@ -284,5 +347,6 @@ int main(int argc, char** argv) {
 	dataStructures();
 	pointers();
 	functions();
+	classes();
 	return 0;
 }
