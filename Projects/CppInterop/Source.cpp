@@ -16,6 +16,7 @@
 #include <regex>  // for string subsitution in log class
 #include <ctime>  // for taking current time
 #include <iomanip>  // for converting time to string
+#include <functional>  // for function template class, used for specifying functions as parameters 
 
 // NOTE: not working...
 std::vector<std::string> splitString(const std::string& delimitedString, const std::string& delimiter) {
@@ -121,12 +122,6 @@ void dataStructures() {
 		std::max<std::size_t>(0, streamString.length() - std::to_string(streamLength).length() - 3),
 		'-'
 	) << " " << std::to_string(streamLength) << "\n";
-
-	CONSOLE_SCREEN_BUFFER_INFO csbi;
-	GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi);
-	int consoleWidth = csbi.srWindow.Right - csbi.srWindow.Left + 1;
-
-	std::cout << "\n" << std::string(consoleWidth, '-') << "\n";
 
 	std::cout << "I can split strings by '|' delimiter:\n";
 	std::string inputDelimitedString;
@@ -312,17 +307,13 @@ template <typename T> std::string vecToString(std::vector<T> vec, std::string de
 	if (vec.size() == 0) {
 		return "";
 	}
-	std::vector<std::string> vecString = std::vector<std::string>(vec.size());
-	for (int i = 0; i < vec.size(); i++) {
-		vecString[i] = static_cast<std::string>(vec[i]);
+	std::ostringstream oss;
+	oss << "{ ";
+	for (int i = 0; i < vec.size()-1; i++) {
+		oss << vec[i] << delimiter;
 	}
-	std::string concatenatedVec = std::accumulate(
-		vecString.begin(),
-		vecString.end(),
-		vecString[0],
-		[delimiter](std::string a, std::string b) {return a + delimiter + b;}  // lambda function
-	);
-	return "{" + concatenatedVec + "}";
+	oss << vec.back() << " }";
+	return oss.str();
 }
 
 void classes() {
@@ -331,7 +322,7 @@ void classes() {
 	std::cout << "random word from csv: " << vecToString(linePicker.pickMany(5)) << "\n";
 
 }
-// TODO: 5. Inheritance, virtual functions, and polymorphism
+// TODO: 5. (DONE) Inheritance, virtual functions, and polymorphism
 
 class AbstractLogger {
 protected:
@@ -407,6 +398,10 @@ void inheritance() {
 }
 
 // TODO: 6. Templates
+void templates() {
+	
+	std::cout << "vecToString in int vec: " << vecToString(std::vector<int>({1,2,3,4,5})) << "\n";
+}
 
 void functions() {
 	std::cout << "\nprintMulti(\"hello\", 2):\n";
@@ -418,12 +413,36 @@ void controlStructures() {}  // including exceptions
 
 void preprocessorDirectives() {}  // make cross platfrom getTerminalWidth
 
+// +---------------------------------------------------------------------------------------------+
+// | Expression Side       | Formal Name                    | Example                            |
+// |-----------------------|--------------------------------|------------------------------------|
+// | Left side (= target)  | Lvalue (Assignable Expression) | x = 5; (x is the lvalue)           |
+// | Right side (= source) | Rvalue (Evaluated Expression)  | x = y + 10; (y + 10 is the rvalue) |
+// +---------------------------------------------------------------------------------------------+
+template <typename... Functions>
+void invokeWithSeparator(char separator, Functions&&... functions) {  // && is universal ref, capabale of holding both lvalue (assignemnt target) and rvalue objects (assignemnt source, like lambdas)
+	CONSOLE_SCREEN_BUFFER_INFO csbi;
+	GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi);
+	int consoleWidth = csbi.srWindow.Right - csbi.srWindow.Left + 1;
+	
+	((functions(), std::cout << "\n\n" << std::string(consoleWidth, separator) << "\n\n"), ...);  // requires cpp17
+}
+
+template <typename... Functions>
+void invokeWithSeparator(Functions&&... functions) {
+	invokeWithSeparator('-', functions...);
+}
+
 int main(int argc, char** argv) {
 	SetConsoleOutputCP(CP_UTF8);
-	dataStructures();
-	pointers();
-	functions();
-	classes();
-	inheritance();
+	invokeWithSeparator(
+		'*',
+		dataStructures,
+		pointers,
+		functions,
+		classes,
+		inheritance,
+		templates
+	);
 	return 0;
 }
