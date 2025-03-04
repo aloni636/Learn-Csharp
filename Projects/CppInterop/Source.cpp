@@ -18,14 +18,30 @@
 #include <iomanip>  // for converting time to string
 #include <functional>  // for function template class, used for specifying functions as parameters 
 
+template <typename T> std::string vecToString(std::vector<T> vec, std::string delimiter = ", ") {
+	if (vec.size() == 0) {
+		return "";
+	}
+	std::ostringstream oss;
+	oss << "{ ";
+	for (int i = 0; i < vec.size() - 1; i++) {
+		oss << vec[i] << delimiter;
+	}
+	oss << vec.back() << " }";
+	return oss.str();
+}
+
 // NOTE: not working...
 std::vector<std::string> splitString(const std::string& delimitedString, const std::string& delimiter) {
     std::vector<std::string> tokens;
     size_t previousPosition = 0;
     size_t currentPosition = 0;
 
-    while ((currentPosition = delimitedString.find(delimiter, previousPosition)) != std::string::npos) {
-        tokens.push_back(delimitedString.substr(previousPosition, currentPosition - previousPosition));
+	while (true) {
+		currentPosition = delimitedString.find(delimiter, previousPosition);
+		if (currentPosition == std::string::npos) break;
+		std::string token = delimitedString.substr(previousPosition, currentPosition - previousPosition);
+        tokens.push_back(token);
         previousPosition = currentPosition + delimiter.length();
     }
     // Push the last token (if any)
@@ -88,7 +104,7 @@ void binaryTree() {
 			delete right;
 		}
 	};
-	// TODO: 2. learn more about new, delete, unique_ptr and shared_ptr
+	// TODO: 2. learn more about new, delete, unique_ptr and shared_ptr in a tree data structure
 	std::unique_ptr<Node> root = std::make_unique<Node>(10);
 	std::mt19937 rngEngine(42);  // defining rng engine
 	std::uniform_int_distribution<int> randomDistribution(1, 100);  // init for config object which passes requirements to an rng engine
@@ -123,13 +139,13 @@ void dataStructures() {
 		'-'
 	) << " " << std::to_string(streamLength) << "\n";
 
-	std::cout << "I can split strings by '|' delimiter:\n";
-	std::string inputDelimitedString;
-	std::cin >> inputDelimitedString;
-	auto stringTokens = splitString(inputDelimitedString, "|");
-	for (std::string token : stringTokens) { std::cout << token << ", "; };  // for each loop
-	std::cout << "\n";
-	// TODO: 8. split by delimiter using std::getline, and store in composite vec
+	const std::string DELIMITER = "| ";
+	std::cout << "I can split strings by \"" + DELIMITER + "\" delimiter:\n";
+	std::string userInputString;
+	std::getline(std::cin, userInputString);
+	auto stringTokens = splitString(userInputString, DELIMITER);
+	std::cout << vecToString(stringTokens)  << "\n";
+	// TODO: 8. (DONE) split by delimiter using std::getline, and store in composite vec
 	// std::string word 
 
 	// composites: arrays, vectors, structs
@@ -303,18 +319,7 @@ public:
 	}
 };
 
-template <typename T> std::string vecToString(std::vector<T> vec, std::string delimiter = ", ") {
-	if (vec.size() == 0) {
-		return "";
-	}
-	std::ostringstream oss;
-	oss << "{ ";
-	for (int i = 0; i < vec.size()-1; i++) {
-		oss << vec[i] << delimiter;
-	}
-	oss << vec.back() << " }";
-	return oss.str();
-}
+
 
 void classes() {
 	RandomLinePicker linePicker = RandomLinePicker("./words.csv");
@@ -397,7 +402,12 @@ void inheritance() {
 	fileLogger.log("I was just written to the file system!");
 }
 
-// TODO: 6. Templates
+// TODO: 6.   (DONE) Function templates
+// TODO: 6.1. Class templates
+// TODO: 6.2. Function templates INSIDE class templates
+// TODO: 6.3. (DONE) Variadic function templates
+// TODO: 6.4. (DONE) Function template specialization
+//
 void templates() {
 	
 	std::cout << "vecToString in int vec: " << vecToString(std::vector<int>({1,2,3,4,5})) << "\n";
