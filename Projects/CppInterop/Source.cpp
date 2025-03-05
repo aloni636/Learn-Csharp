@@ -407,7 +407,8 @@ void inheritance() {
 // TODO: 6.2. Function templates INSIDE class templates
 // TODO: 6.3. (DONE) Variadic function templates
 // TODO: 6.4. (DONE) Function template specialization
-//
+// TODO: 7. <type_traits>
+// TODO: 8. (partially done) Fold expressions
 void templates() {
 	
 	std::cout << "vecToString in int vec: " << vecToString(std::vector<int>({1,2,3,4,5})) << "\n";
