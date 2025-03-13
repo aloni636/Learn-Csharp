@@ -21,10 +21,9 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{865c9fdd-8242-4555-981c-e475c4c4ade1}</ProjectGuid>
-    <RootNamespace>CppInterop</RootNamespace>
+    <ProjectGuid>{228acfb5-a16d-40d1-8def-0748ff1bdf36}</ProjectGuid>
+    <RootNamespace>HeaderOnlyLib</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-    <ProjectName>CppConsoleApp</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -105,7 +104,6 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <TreatWarningAsError>true</TreatWarningAsError>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -130,14 +128,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="MyUtilities.cpp" />
-    <ClCompile Include="Source.cpp" />
+    <ClCompile Include="..\Projects\CppInterop\HeaderOnlyDemo.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="words.csv" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="MyUtilities.h" />
+    <ClInclude Include="..\Projects\CppInterop\HeaderOnlyLib.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

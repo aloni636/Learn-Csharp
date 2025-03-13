@@ -15,18 +15,12 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Source.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="MyUtilities.cpp">
+    <ClCompile Include="..\Projects\CppInterop\HeaderOnlyDemo.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="words.csv" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="MyUtilities.h">
+    <ClInclude Include="..\Projects\CppInterop\HeaderOnlyLib.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
