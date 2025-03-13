@@ -14,12 +14,17 @@ class Program
         CppCliClass interop = new CppCliClass();
         Console.WriteLine($@"Basic data structures from C++/CLI:
   String: {interop.GetString()}
-  Solution to the universe: {interop.GetString()}
+  Solution to the universe: {interop.GetInt()}
   Pi: {interop.GetDouble()}
   Is 42 Positive? {interop.IsPositive(42)}
   Division(5,2): {interop.IntDivision(5, 2)}
 ");
+
         string helloWorld = interop.AppendStrings("hello", " world");
-        Console.WriteLine($"Appending in native C++: {helloWorld}");
+        Console.WriteLine($"Appending in native C++: {helloWorld}\n");
+
+        string managedUTF16String = interop.GetUTF16String();
+        Console.WriteLine($"Received a UTF16 native std::wstring: {managedUTF16String}");
+
     }
 }
