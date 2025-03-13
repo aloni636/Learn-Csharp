@@ -3,6 +3,8 @@
 #include <iostream>
 #include <string>
 #include <msclr/marshal_cppstd.h>  // for converting between .NET types and native CPP types
+#include <array>  // for std::array 
+#include <algorithm>
 
 namespace CppCli {  
     CppCliClass::CppCliClass() {}
@@ -34,5 +36,29 @@ namespace CppCli {
         const std::wstring utf16String = L"Hello UTF16";
         String^ managedUTF16String = gcnew String(utf16String.c_str());
         return managedUTF16String;
+    };
+
+    array<int>^ CppCliClass::GetFixedArray() {
+        array<int>^ managedArray = gcnew array<int> {1, 2, 3, 4, 5};
+        return managedArray;
+    }
+
+    void CppCliClass::ClampIntElements(array<int>^% managedArray, int min, int max) {  // ^% is a managed reference handler
+        size_t managedArraySize = managedArray->Length;
+        for (int i = 0; i < managedArraySize; i++) {
+            int element = managedArray[i];
+            managedArray[i] = std::clamp(element, min, max);
+        }
+    }
+
+    List<int>^ CppCliClass::GetDynamicArray(size_t size) {
+        List<int>^ managedVector = gcnew List<int>(size);
+        for (int i = 0; i < size;i++) {
+            managedVector->Add(i);
+        }
+        return managedVector;
+    }
+    void CppCliClass::AppendIntToArray(List<int>^% vec, int element) {
+        vec->Add(element);
     };
 }

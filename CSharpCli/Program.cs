@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Numerics;
 using CppCli;  // Ensure this matches the namespace in C++/CLI
 
 // TODO (1): Pass complex data types (arrays, structs, std::vector).
@@ -24,7 +25,18 @@ class Program
         Console.WriteLine($"Appending in native C++: {helloWorld}\n");
 
         string managedUTF16String = interop.GetUTF16String();
-        Console.WriteLine($"Received a UTF16 native std::wstring: {managedUTF16String}");
+        Console.WriteLine($"Received a UTF16 native std::wstring: {managedUTF16String}\n");
+
+        int[] staticArray = interop.GetFixedArray();
+        Console.WriteLine("Static array from native C++: " + String.Join(", ", staticArray));
+        interop.ClampIntElements(ref staticArray, 2, 4);
+        Console.WriteLine("Clamping inplace in C++: " + String.Join(", ", staticArray) + "\n");
+
+        List<int> dynamicArray = interop.GetDynamicArray(8);
+        Console.WriteLine("Dynamic array from C++: " + String.Join(", ", dynamicArray));
+        interop.AppendIntToArray(ref dynamicArray, 2);
+        Console.WriteLine("Appending inplace in C++: " + String.Join(", ", dynamicArray) + "\n");
+
 
     }
 }
