@@ -9,7 +9,7 @@ int addNumbers(int a, int b) { return a + b; };
 float addNumbers(float a, float b) { return a + b; };
 
 std::string concatenateStrings(std::string& a, std::string& b) { return a + b; };
-std::string concatenateStrings(char* a, char* b) {
+std::string concatenateStrings(const char* a, const char* b) {
 	if (a == nullptr or b == nullptr) {
 		throw std::runtime_error("Cannot convert ");
 	};

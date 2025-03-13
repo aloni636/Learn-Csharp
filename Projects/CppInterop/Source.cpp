@@ -17,6 +17,7 @@
 #include <ctime>  // for taking current time
 #include <iomanip>  // for converting time to string
 #include <functional>  // for function template class, used for specifying functions as parameters 
+#include "MyUtilities.h"  // for messing around with compiled library (as oppose to header only lib)
 
 template <typename T> std::string vecToString(std::vector<T> vec, std::string delimiter = ", ") {
 	if (vec.size() == 0) {
@@ -424,6 +425,16 @@ void controlStructures() {}  // including exceptions
 
 void preprocessorDirectives() {}  // make cross platfrom getTerminalWidth
 
+void includes() {
+	int foreignAddition = addNumbers(1, 2);
+	std::cout << "Computing 1+2 using compiled lib:" << foreignAddition << "\n";
+
+	const char* a = "hello";
+	const char* b = "world";
+	std::string ab = concatenateStrings(a, b);
+	std::cout << "Concatenating 2 c style strings using compiled lib:" << foreignAddition;
+}
+
 // +---------------------------------------------------------------------------------------------+
 // | Expression Side       | Formal Name                    | Example                            |
 // |-----------------------|--------------------------------|------------------------------------|
@@ -431,7 +442,7 @@ void preprocessorDirectives() {}  // make cross platfrom getTerminalWidth
 // | Right side (= source) | Rvalue (Evaluated Expression)  | x = y + 10; (y + 10 is the rvalue) |
 // +---------------------------------------------------------------------------------------------+
 template <typename... Functions>
-void invokeWithSeparator(char separator, Functions&&... functions) {  // && is universal ref, capabale of holding both lvalue (assignemnt target) and rvalue objects (assignemnt source, like lambdas)
+void invokeWithSeparator(char separator, Functions&&... functions) {  // && is universal ref, capabale of holding both lvalue (assignemnt target) and rvalue objects (assignment source, like lambdas)
 	CONSOLE_SCREEN_BUFFER_INFO csbi;
 	GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi);
 	int consoleWidth = csbi.srWindow.Right - csbi.srWindow.Left + 1;
@@ -453,7 +464,8 @@ int main(int argc, char** argv) {
 		functions,
 		classes,
 		inheritance,
-		templates
+		templates,
+		includes
 	);
 	return 0;
 }
