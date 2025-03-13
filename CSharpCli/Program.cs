@@ -19,5 +19,7 @@ class Program
   Is 42 Positive? {interop.IsPositive(42)}
   Division(5,2): {interop.IntDivision(5, 2)}
 ");
+        string helloWorld = interop.AppendStrings("hello", " world");
+        Console.WriteLine($"Appending in native C++: {helloWorld}");
     }
 }

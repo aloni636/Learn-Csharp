@@ -1,5 +1,6 @@
 // NOTE: Whenever modifying the CPP code, a build of the CPP/CLI project is required.
 #pragma once
+#include <msclr/marshal_cppstd.h>  // For conversions
 
 using namespace System;
 
@@ -12,5 +13,6 @@ namespace CppCli {  // The namespace being used when including C++ in C#, i.e. `
         double GetDouble();
         int IntDivision(int a, int b);
         bool IsPositive(int x);
+        String^ AppendStrings(String^ a, String^ b);
     };
 }
