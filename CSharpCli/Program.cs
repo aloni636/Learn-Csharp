@@ -37,6 +37,7 @@ class Program
         interop.AppendIntToArray(ref dynamicArray, 2);
         Console.WriteLine("Appending inplace in C++: " + String.Join(", ", dynamicArray) + "\n");
 
-
+        CppCli.ManagedStruct managedStruct = interop.GetStruct();
+        Console.WriteLine($"Stack allocated native C++ struct: {interop.StructAsString(managedStruct)}");
     }
 }

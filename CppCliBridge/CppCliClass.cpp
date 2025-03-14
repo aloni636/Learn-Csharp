@@ -5,6 +5,7 @@
 #include <msclr/marshal_cppstd.h>  // for converting between .NET types and native CPP types
 #include <array>  // for std::array 
 #include <algorithm>
+#include <sstream>  // for stringstream
 
 namespace CppCli {  
     CppCliClass::CppCliClass() {}
@@ -61,4 +62,25 @@ namespace CppCli {
     void CppCliClass::AppendIntToArray(List<int>^% vec, int element) {
         vec->Add(element);
     };
+
+    // Overloading works between CPP and C#
+    ManagedStruct CppCliClass::GetStruct(int X, int Y, String^ Content) {
+        ManagedStruct out;
+        out.X = 0;
+        out.Y = 0;
+        out.Content = Content;
+        return out;
+    }
+    ManagedStruct CppCliClass::GetStruct() {
+        return GetStruct(0,0,"Empty");
+    }
+    String^ CppCliClass::StructAsString(ManagedStruct managedStruct) {
+        std::stringstream ss;
+        ss << "{X: " << managedStruct.X << ", Y: " << managedStruct.Y << ", Content: \"" << msclr::interop::marshal_as<std::string>(managedStruct.Content) << "\"}";
+        return gcnew String(ss.str().c_str());
+    };
+
+    //ManagedStruct CppCliClass::GetStruct() {
+    //    return ManagedStruct{ 0, 0, "Empty Struct"};
+    //}
 }
