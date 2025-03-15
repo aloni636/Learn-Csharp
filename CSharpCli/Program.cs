@@ -39,5 +39,8 @@ class Program
 
         CppCli.ManagedStruct managedStruct = interop.GetStruct();
         Console.WriteLine($"Stack allocated native C++ struct: {interop.StructAsString(managedStruct)}");
+
+        ManagedRandomNumberGenerator mrng = new ManagedRandomNumberGenerator(42, 1, 5);  // TODO: automatically generating seed leads to generate() calls returning 1749605806 and not respecting minmax bounds
+        Console.WriteLine($"Generating random number using native C++ class: {mrng.generate()}\n");
     }
 }

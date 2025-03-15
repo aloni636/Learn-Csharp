@@ -80,7 +80,18 @@ namespace CppCli {
         return gcnew String(ss.str().c_str());
     };
 
-    //ManagedStruct CppCliClass::GetStruct() {
-    //    return ManagedStruct{ 0, 0, "Empty Struct"};
-    //}
+    // Native class wrapper
+    ManagedRandomNumberGenerator::ManagedRandomNumberGenerator(int seed, int min, int max) {
+        this->nativeObj = new RandomNumberGenerator(seed, min, max);
+    }
+    ManagedRandomNumberGenerator::ManagedRandomNumberGenerator(int min, int max) {
+        this->nativeObj = new RandomNumberGenerator(min, max);
+    }
+    int ManagedRandomNumberGenerator::generate() {
+        return this->nativeObj->generate();
+    }
+    ManagedRandomNumberGenerator::~ManagedRandomNumberGenerator() {
+        std::cout << "[C++/CLI]: Deleting RandomNumberGenerator.\n";
+        delete this->nativeObj;
+    }
 }
