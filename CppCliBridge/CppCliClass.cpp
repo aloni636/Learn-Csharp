@@ -79,6 +79,14 @@ namespace CppCli {
         ss << "{X: " << managedStruct.X << ", Y: " << managedStruct.Y << ", Content: \"" << msclr::interop::marshal_as<std::string>(managedStruct.Content) << "\"}";
         return gcnew String(ss.str().c_str());
     };
+    
+    // Calling C# from C++/CLI
+    int CppCliClass::CSharpCachedRecursiveFactorial(int factorial) {
+        return CSharpCli::CSharpClass().CachedRecursiveFactorial(factorial);
+    }
+    CSharpClass^ CppCliClass::GetCSharpClass() {
+        return gcnew CSharpClass();
+    }
 
     // Native class wrapper
     ManagedRandomNumberGenerator::ManagedRandomNumberGenerator(int seed, int min, int max) {

@@ -7,6 +7,11 @@
 using namespace System;
 using namespace System::Collections::Generic;  // for List type
 
+// To add reference to a C# project, make sure it `.NET Framework Class Library` and is matching the .NET Framework version:
+// [C#]: right click on the project -> Properties -> Application -> Target framework
+// [C++/CLI]: right click on the project -> Properties -> Configuration Properties -> Advanced -> .Net Target Framework Version
+using namespace CSharpCli;
+
 namespace CppCli {  // The namespace being used when including C++ in C#, i.e. `using CppCli`
     public value struct ManagedStruct {  // value struct behaves like C# struct which is stack allocated
     public:
@@ -36,6 +41,10 @@ namespace CppCli {  // The namespace being used when including C++ in C#, i.e. `
         ManagedStruct GetStruct(int X, int Y, String^ Content);
         ManagedStruct GetStruct();
         String^ StructAsString(ManagedStruct managedStruct);
+        
+        // Calling C# from C++/CLI
+        int CSharpCachedRecursiveFactorial(int factorial);
+        CSharpClass^ GetCSharpClass();
     };
     
     // Native class wrapper

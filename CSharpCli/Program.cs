@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Numerics;
 using CppCli;  // Ensure this matches the namespace in C++/CLI
+using CSharpCli;  // Project reference to the C# .Net Framework Project is required to use it's classes as types
 
 // TODO (1): Pass complex data types (arrays, structs, std::vector).
 // TODO (2): Handle memory ownership (who allocates/deallocates?).
@@ -42,5 +43,23 @@ class Program
 
         ManagedRandomNumberGenerator mrng = new ManagedRandomNumberGenerator(42, 1, 5);  // TODO: automatically generating seed leads to generate() calls returning 1749605806 and not respecting minmax bounds
         Console.WriteLine($"Generating random number using native C++ class: {mrng.generate()}\n");
+
+        int factorial = 5;
+        // C# Instance initialization AND Method calling in C++/CLI
+        int cppCliFactorial = interop.CSharpCachedRecursiveFactorial(factorial);
+        // C# Instance initialization in C++/CLI, Method calling in C#
+        CSharpClass managedCSharpClass = interop.GetCSharpClass();
+        int managedCSharpFactorial = managedCSharpClass.CachedRecursiveFactorial(factorial);
+        // C# Instance initialization AND Method calling in C#
+        CSharpClass cSharpClass = new CSharpClass();
+        int cSharpFactorial = cSharpClass.CachedRecursiveFactorial(factorial);
+
+        Console.WriteLine($@"
+Computing factorial of {factorial} using 3 levels of C++ - C# interop:
+C# Instance initialization AND Method calling in C++/CLI: {cppCliFactorial}
+C# Instance initialization in C++/CLI, Method calling in C#: {managedCSharpFactorial}
+C# Instance initialization AND Method calling in C#: {cSharpFactorial}
+");
+
     }
 }

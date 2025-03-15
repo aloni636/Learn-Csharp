@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\ClassLibrary1\CSharpCli.csproj" />
     <ProjectReference Include="..\CppCliBridge\CppCliBridge.vcxproj" />
   </ItemGroup>
 
