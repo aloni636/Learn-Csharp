@@ -7,6 +7,7 @@
 // TODO (4): Understanding Window Procedures(WndProc)
 // TODO (5): Working with System Hooks(More Advanced)
 
+std::wstring logString;
 // Window Procedure: Handles messages sent to the window
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
     switch (uMsg) {
@@ -16,21 +17,30 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
     case WM_DESTROY:
         PostQuitMessage(0);
         return 0;
+
     case WM_KEYDOWN:
     {
         char key = (char)wParam; // Get the key that was pressed
-
-        std::wstringstream ss;
-        ss << L"Key Pressed: " << key;
-        MessageBox(hwnd, ss.str().c_str(), L"Key Event", MB_OK);
+        logString = (L"Key Pressed: " + (wchar_t)key);
+        InvalidateRect(hwnd, NULL, TRUE);
+        return 0;
     }
-    return 0;
     case WM_SIZE:
-        MessageBox(hwnd, L"Window resized", L"Window Event", MB_OK);
+        logString = L"Window resized";
+        InvalidateRect(hwnd, NULL, TRUE);
         return 0;
     case WM_LBUTTONDOWN:
-        MessageBox(hwnd, L"Mouse clicked!", L"Mouse Event", MB_OK);
+        logString = L"Mouse clicked";
+        InvalidateRect(hwnd, NULL, TRUE);
         return 0;
+    case WM_PAINT: { // Redraw the window and display text
+        PAINTSTRUCT ps;
+        HDC hdc = BeginPaint(hwnd, &ps);
+        TextOut(hdc, 20, 50, logString.c_str(), (int)logString.length());
+        EndPaint(hwnd, &ps);
+        return 0;
+    }
+
     default:
         return DefWindowProc(hwnd, uMsg, wParam, lParam);  // Handle signals using default Windows behavior
     }
