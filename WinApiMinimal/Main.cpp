@@ -1,4 +1,5 @@
 #include <windows.h>
+#include <sstream>
 
 // TODO (1): Create and Show a Window(Essential for TSF)
 // TODO (2): Explore the Windows Message System
@@ -15,8 +16,24 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
     case WM_DESTROY:
         PostQuitMessage(0);
         return 0;
+    case WM_KEYDOWN:
+    {
+        char key = (char)wParam; // Get the key that was pressed
+
+        std::wstringstream ss;
+        ss << L"Key Pressed: " << key;
+        MessageBox(hwnd, ss.str().c_str(), L"Key Event", MB_OK);
     }
-    return DefWindowProc(hwnd, uMsg, wParam, lParam);  // Handle signals using default Windows behavior
+    return 0;
+    case WM_SIZE:
+        MessageBox(hwnd, L"Window resized", L"Window Event", MB_OK);
+        return 0;
+    case WM_LBUTTONDOWN:
+        MessageBox(hwnd, L"Mouse clicked!", L"Mouse Event", MB_OK);
+        return 0;
+    default:
+        return DefWindowProc(hwnd, uMsg, wParam, lParam);  // Handle signals using default Windows behavior
+    }
 }
 
 // Entry point
