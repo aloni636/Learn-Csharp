@@ -1,9 +1,12 @@
 #include <windows.h>
-#include <sstream>
+
 #include "windowsx.h"  // for GET_X_LPARAM and GET_Y_LPARAM
 
 #include <dwmapi.h> // Required for rounded corners
 #pragma comment(lib, "Dwmapi.lib") // Link the library
+
+#include <sstream>
+#include <cwctype>  // for isspace()
 
 // TODO 1 (DONE): Create and Show a Window(Essential for TSF)
 // TODO (2): Explore the Windows Message System
@@ -17,10 +20,10 @@ const int ANIMATION_DURATION_IN_MS = 300;
 
 HFONT hFont;
 
-wchar_t lastEventReport[50] = L"Waiting for events...";  // Store the last non realtime event
-wchar_t lastMousePositionReport[50] = L"[...]";  // 
-
-
+wchar_t lastEventReport[50] = L"Waiting for events...";  // Report last non realtime event
+wchar_t lastMousePositionReport[50] = L"Mouse moved to (...)";  // Report realtime mouse position
+wchar_t lastCharTyped[50] = L"Typed character:";
+std::wstring wordTyped = L"";
 
 // Window Procedure: Handles messages sent to the window
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
@@ -75,6 +78,8 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
         MINMAXINFO* mmi = (MINMAXINFO*)lParam;
         mmi->ptMinTrackSize.x = 300; // Minimum width
         mmi->ptMinTrackSize.y = 200; // Minimum height
+        // mmi->ptMaxTrackSize.x = 800; // Max width
+        // mmi->ptMaxTrackSize.y = 600; // Max height
         return 0; // Indicate we handled it
     }
     case WM_SIZE:
@@ -95,7 +100,22 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
             PostQuitMessage(0);
             return 0;
         }
+        if ((keyPressed == VK_BACK)&&(not wordTyped.empty())) {
+            wordTyped.pop_back();
+        }
         swprintf_s(lastEventReport, L"Key pressed: \'%c\' | %d", keyPressed, keyPressed);
+        InvalidateRect(hwnd, NULL, TRUE); // Request window redraw
+        return 0;
+    }
+    case WM_CHAR: {
+        wchar_t inputChar = (wchar_t)wParam;
+        if (!std::iswcntrl(inputChar)) {
+            wordTyped += inputChar;
+        }
+        if (std::iswspace(inputChar)) {
+            wordTyped = L"";
+        }
+        swprintf_s(lastCharTyped, L"Typed: \'%c\'", inputChar);
         InvalidateRect(hwnd, NULL, TRUE); // Request window redraw
         return 0;
     }
@@ -141,7 +161,11 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
 
         // Text Content
         TextOut(hdc, centerX, centerY-20, lastEventReport, wcslen(lastEventReport));
-        TextOut(hdc, centerX, centerY+0, lastMousePositionReport, wcslen(lastMousePositionReport));
+        TextOut(hdc, centerX, centerY+0, lastCharTyped, wcslen(lastCharTyped));
+        std::wstring wordTypedReport = L"Current word: \"" + wordTyped + L"\" (" + std::to_wstring(wordTyped.length()) + L")";
+        const wchar_t* wordsTypedCString = wordTypedReport.c_str();
+        TextOut(hdc, centerX, centerY+20, wordsTypedCString, wcslen(wordsTypedCString));
+        TextOut(hdc, centerX, centerY + 40, lastMousePositionReport, wcslen(lastMousePositionReport));
         
         EndPaint(hwnd, &ps);
         return 0;
