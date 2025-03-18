@@ -5,7 +5,7 @@
 #include <dwmapi.h> // Required for rounded corners
 #pragma comment(lib, "Dwmapi.lib") // Link the library
 
-// TODO (1): Create and Show a Window(Essential for TSF)
+// TODO 1 (DONE): Create and Show a Window(Essential for TSF)
 // TODO (2): Explore the Windows Message System
 // TODO (3): Handling Basic Events(Key & Mouse Input)
 // TODO (4): Understanding Window Procedures(WndProc)
@@ -71,15 +71,18 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
 
         return HTCAPTION; // Allow dragging anywhere else
         }
-    
+    case WM_GETMINMAXINFO: {
+        MINMAXINFO* mmi = (MINMAXINFO*)lParam;
+        mmi->ptMinTrackSize.x = 300; // Minimum width
+        mmi->ptMinTrackSize.y = 200; // Minimum height
+        return 0; // Indicate we handled it
+    }
     case WM_SIZE:
         InvalidateRect(hwnd, NULL, TRUE); // Request a redraw to keep text centered when resizing
         return 0;
-    // NOTE: Borderless means I'm managing closing the window using the keyboard
-    // case WM_CLOSE:  // when closed
-    //     AnimateWindow(hwnd, 300, AW_BLEND | AW_HIDE); // Slide out to the left
-    //     PostQuitMessage(0);
-    //     return 0;
+    case WM_CLOSE:  // when closed using Windows (right click -> close window, etc)
+         PostQuitMessage(0);
+         return 0;
 
 
     // Keyboard Events
@@ -92,7 +95,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
             PostQuitMessage(0);
             return 0;
         }
-        swprintf_s(lastEventReport, L"Key pressed: %c", keyPressed);
+        swprintf_s(lastEventReport, L"Key pressed: \'%c\' | %d", keyPressed, keyPressed);
         InvalidateRect(hwnd, NULL, TRUE); // Request window redraw
         return 0;
     }
