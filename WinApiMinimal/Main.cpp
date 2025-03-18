@@ -1,3 +1,10 @@
+// Tips:
+// * Run using basic ctrl+f5
+// * Close window using esc 
+// * The program tracks how many words you typed, with each word delimited by a whitespace
+// * It also showcases mouse events
+// * The window is resizable and draggable
+// 99% of dev is at the event handling part, not in the window creation at WinMain  
 #include <windows.h>
 
 #include "windowsx.h"  // for GET_X_LPARAM and GET_Y_LPARAM
@@ -24,6 +31,7 @@ wchar_t lastEventReport[50] = L"Waiting for events...";  // Report last non real
 wchar_t lastMousePositionReport[50] = L"Mouse moved to (...)";  // Report realtime mouse position
 wchar_t lastCharTyped[50] = L"Typed character:";
 std::wstring wordTyped = L"";
+int totalWords = 0;
 
 // Window Procedure: Handles messages sent to the window
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
@@ -114,6 +122,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
         }
         if (std::iswspace(inputChar)) {
             wordTyped = L"";
+            totalWords += 1;
         }
         swprintf_s(lastCharTyped, L"Typed: \'%c\'", inputChar);
         InvalidateRect(hwnd, NULL, TRUE); // Request window redraw
@@ -162,10 +171,12 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
         // Text Content
         TextOut(hdc, centerX, centerY-20, lastEventReport, wcslen(lastEventReport));
         TextOut(hdc, centerX, centerY+0, lastCharTyped, wcslen(lastCharTyped));
-        std::wstring wordTypedReport = L"Current word: \"" + wordTyped + L"\" (" + std::to_wstring(wordTyped.length()) + L")";
+        std::wstring wordTypedReport = L"Current word: \"" + wordTyped + L"\" (" + std::to_wstring(wordTyped.length()) + L"c/" + std::to_wstring(totalWords) + L"w)";
         const wchar_t* wordsTypedCString = wordTypedReport.c_str();
         TextOut(hdc, centerX, centerY+20, wordsTypedCString, wcslen(wordsTypedCString));
         TextOut(hdc, centerX, centerY + 40, lastMousePositionReport, wcslen(lastMousePositionReport));
+        const wchar_t* CLOSE_GUIDE = L"Press esc to close";
+        TextOut(hdc, centerX, centerY + 60, CLOSE_GUIDE, wcslen(CLOSE_GUIDE));
         
         EndPaint(hwnd, &ps);
         return 0;
