@@ -11,10 +11,12 @@ int main()
 {
     // Ref: https://stackoverflow.com/a/8696688
     std::cout << "Loading DLL at runtime...\n";
-    LPCWSTR DLL_PATH = L"..\\..\\x64\\Debug\\MathDLL.dll";
+    LPCWSTR DLL_PATH = L"..\\..\\x64\\Debug\\MathDLL.dl";
     HINSTANCE hDLL = LoadLibrary(DLL_PATH);
     if (hDLL == NULL) {
-        std::cout << "Error: Failed to load DLL\n";
+        DWORD dllLoadErrorCode = GetLastError();
+        std::cout << "Error: Failed to load DLL (ERROR CODE: " << dllLoadErrorCode << ")\n";
+        // You can use FormatMessage to retrieve a decoded message, but it's a complex function, so... no
         return EXIT_FAILURE;
     }
     
