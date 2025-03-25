@@ -1,0 +1,2 @@
+#define FAKECOMRUNTIME_API __declspec(dllexport)
+#define FAKECOMRUNTIME_API __declspec(dllimport)

@@ -1,0 +1,2 @@
+#define FAKECOMDLL_API __declspec(dllexport)
+#define FAKECOMDLL_API __declspec(dllimport)

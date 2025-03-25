@@ -11,7 +11,7 @@ int main()
 {
     // Ref: https://stackoverflow.com/a/8696688
     std::cout << "Loading DLL at runtime...\n";
-    LPCWSTR DLL_PATH = L"..\\..\\x64\\Debug\\MathDLL.dl";
+    LPCWSTR DLL_PATH = L"..\\..\\x64\\Debug\\MathDLL.dll";
     HINSTANCE hDLL = LoadLibrary(DLL_PATH);
     if (hDLL == NULL) {
         DWORD dllLoadErrorCode = GetLastError();
