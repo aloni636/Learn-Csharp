@@ -1,6 +1,6 @@
 #include <windows.h>
-#include <shobjidl.h>
-#include <atlbase.h>
+#include <shobjidl.h>  // windows file dialogs
+#include <atlbase.h>  // RAII COM memory management
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
 	HRESULT hr;

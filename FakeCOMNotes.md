@@ -1,0 +1,1 @@
+NOTE: Those FakeCOM projects are incomplete on purpose, as to focus my time on real-life COM

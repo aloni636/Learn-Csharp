@@ -18,7 +18,26 @@ static const IID IID_IGreeter = { /* d9c45dc8-9d13-4773-af01-2b9ff98dbb2a */
     0x4773,
     {0xaf, 0x01, 0x2b, 0x9f, 0xf9, 0x8d, 0xbb, 0x2a}
 };
-// Custom COM interface
+
+// COM interface declaration
 struct IGreeter : public IUnknown {
-    virtual HRESULT STDMETHODCALLTYPE Greet(const wchar_t* name) = 0;  // low level call convention is set to standard - ensures ABI compatability, i.e. __stdcall
+    virtual HRESULT STDMETHODCALLTYPE Greet(PWSTR name) = 0;  // low level call convention is set to standard - ensures ABI compatability, i.e. __stdcall
+};
+
+// COM implementer class
+class Greeter : public IGreeter {
+private:
+    std::atomic<ULONG> refCount = 0;
+public:
+    // COM Methods
+    HRESULT STDMETHODCALLTYPE QueryInterface(REFIID riid, void** ppvObject) override;
+    ULONG STDMETHODCALLTYPE AddRef() override;
+    ULONG STDMETHODCALLTYPE Release() override;
+
+    // Business logic
+    HRESULT STDMETHODCALLTYPE Greet(PWSTR name) override;
+
+    // Constructor/Destructor
+    Greeter();
+    ~Greeter();
 };
