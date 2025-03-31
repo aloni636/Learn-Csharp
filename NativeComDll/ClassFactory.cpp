@@ -126,10 +126,9 @@ HRESULT STDMETHODCALLTYPE DllRegisterServer() {
     if (FAILED(hr)) {
         return SELFREG_E_CLASS;
     }
-    std::wstring registrySubKeyPath = (L"CLSID\\" + std::wstring(clsidAsString) + L"\\InprocServer32");
+    std::wstring registrySubKeyPath = L"CLSID\\" + std::wstring(clsidAsString);
     // "The caller is responsible for freeing the memory allocated for the string by calling the CoTaskMemFree function." - Ref: https://learn.microsoft.com/en-us/windows/win32/api/combaseapi/nf-combaseapi-stringfromclsid
     CoTaskMemFree(clsidAsString);
-
 
     wchar_t currentModulePathBuffer[MAX_PATH];
     DWORD modulePathLength = GetModuleFileName(
@@ -146,15 +145,16 @@ HRESULT STDMETHODCALLTYPE DllRegisterServer() {
     HKEY registryKeyHandle;
     DWORD keyExists;
     
+    // Q: What happens when I have an error midway? I need transcations
     // Registry Key base
     hr = RegCreateKeyExW(  // Ref: https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regcreatekeyexa
         HKEY_CLASSES_ROOT,  // https://learn.microsoft.com/en-us/windows/win32/sysinfo/predefined-keys
         registrySubKeyPath.c_str(),
         0,
-        NULL,  // Q: Should I have a class type for this?
-        REG_OPTION_NON_VOLATILE,  // Q: Is it the correct REG_OPTION?
-        NULL,  // Q: What's the appropriate security descriptor?
-        NULL,  // Q: Relevant?
+        NULL,  // legacy Windows 3.x feature, can be NULL
+        REG_OPTION_NON_VOLATILE,
+        NULL,  // Access control is better handeled "via an installer or system-level policy."
+        NULL,  // Not Relevant when ACL is controled by the installer or system-level policy
         &registryKeyHandle,
         &keyExists  // REG_CREATED_NEW_KEY | REG_OPENED_EXISTING_KEY
     );
@@ -167,7 +167,7 @@ HRESULT STDMETHODCALLTYPE DllRegisterServer() {
             registryKeyHandle,
             NULL,  // Set to (default)
             0,
-            REG_SZ,  // Q: Is it the correct registry type
+            REG_SZ,  // Single line of string entry type
             (const BYTE*)CLSID_TITLE.c_str(),
             string_bytes_count(CLSID_TITLE)
         );
@@ -181,12 +181,12 @@ HRESULT STDMETHODCALLTYPE DllRegisterServer() {
         HKEY_CLASSES_ROOT,  // https://learn.microsoft.com/en-us/windows/win32/sysinfo/predefined-keys
         (registrySubKeyPath + L"\\InprocServer32").c_str(),
         0,
-        NULL,  // Q: Should I have a class type for this?
-        REG_OPTION_NON_VOLATILE,  // Q: Is it the correct REG_OPTION?
-        NULL,  // Q: What's the appropriate security descriptor?
-        NULL,  // Q: Relevant?
+        NULL,
+        REG_OPTION_NON_VOLATILE,
+        NULL,
+        NULL,
         &registryKeyHandle,
-        &keyExists  // REG_CREATED_NEW_KEY | REG_OPENED_EXISTING_KEY
+        &keyExists
     );
     if (FAILED(hr)) {
         return SELFREG_E_CLASS;
@@ -196,8 +196,8 @@ HRESULT STDMETHODCALLTYPE DllRegisterServer() {
             registryKeyHandle,
             NULL,  // Set to (default)
             0,
-            REG_SZ,  // Q: Is it the correct registry type
-            (const BYTE*)currentModulePath.c_str(),  // Q: Is casting to const BYTE* correct?
+            REG_SZ,
+            (const BYTE*)currentModulePath.c_str(),  // `const BYTE*` casting is fine here
             string_bytes_count(currentModulePath)
         );
         std::wstring THREADING_MODEL = L"Apartment";  // Can use const wchar_t* to avoid memory allocation
@@ -205,8 +205,8 @@ HRESULT STDMETHODCALLTYPE DllRegisterServer() {
             registryKeyHandle,
             L"ThreadingModel",  // Set to (default)
             0,
-            REG_SZ,  // Q: Is it the correct registry type
-            (const BYTE*)THREADING_MODEL.c_str(),  // Q: Is casting to const BYTE* correct?
+            REG_SZ,
+            (const BYTE*)THREADING_MODEL.c_str(),
             string_bytes_count(THREADING_MODEL)
         );
     }
@@ -220,7 +220,58 @@ HRESULT STDMETHODCALLTYPE DllRegisterServer() {
     // SELFREG_E_CLASS: The server was unable to complete the registration of all the object classes.
 };
 
-HRESULT STDMETHODCALLTYPE DllUnregisterServer();
+
+// +-----------------+---------------------------------------------------------------------+
+// | Function        | Purpose                                                             |
+// +-----------------+---------------------------------------------------------------------+
+// | StringFromCLSID | Convert CLSID_Greeter into a string like "{A1B2C3...}"              |
+// | RegDeleteTreeW  | Deletes an entire registry key and all its subkeys                  |
+// | RegDeleteKeyExW | Alternative to RegDeleteTreeW if you're on older systems (optional) |
+// | CoTaskMemFree   | Free the result of StringFromCLSID                                  |
+// +-----------------+---------------------------------------------------------------------+
+HRESULT STDMETHODCALLTYPE DllUnregisterServer() {
+    HRESULT hr;  // Result for windows operations in this function
+
+    // HKEY_CLASSES_ROOT\CLSID\{clsid}\InprocServer32
+    LPOLESTR clsidAsString;
+    hr = StringFromCLSID(CLSID_Greeter, &clsidAsString);
+    if (FAILED(hr)) {
+        return SELFREG_E_CLASS;
+    }
+    std::wstring registrySubKeyPath = (L"CLSID\\" + std::wstring(clsidAsString));
+    CoTaskMemFree(clsidAsString);
+
+    // HKEY registryKeyHandle;
+    // RegOpenKeyExW(
+    //     HKEY_CLASSES_ROOT,
+    //     registrySubKeyPath.c_str(),
+    //     0,
+    //     // Q: Are those the correct access rights?
+    //     DELETE |
+    //     KEY_ENUMERATE_SUB_KEYS |
+    //     KEY_QUERY_VALUE,
+    //     &registryKeyHandle
+    // );
+    // Q: Is this fine or do we need RegOpenKeyExW call to get the correct access rights?
+    // Q: Will it delete the entry itself or only it's children? Failing to delete itself will make `if (keyExists == REG_CREATED_NEW_KEY)` false and fail to populate the key after a (create -> delete -> create) cycle
+    // Q: Why the docs have a special exception for when the key has values?
+    //    "If the key has values, it must be opened with KEY_SET_VALUE or this function will fail with ERROR_ACCESS_DENIED."
+    LSTATUS treeDeleteResult = RegDeleteTreeW(
+        HKEY_CLASSES_ROOT,  // Run with admin to have this key populated with full delete permissions
+        registrySubKeyPath.c_str()
+    );
+    if (treeDeleteResult!= ERROR_SUCCESS and treeDeleteResult != ERROR_FILE_NOT_FOUND) {  // Failure if result is not success AND the key exists
+        return SELFREG_E_CLASS;
+    }
+    return S_OK;
+    // E_OUTOFMEMORY: Standard return values
+    // E_UNEXPECTED: Standard return values
+    // 
+    // S_OK: The registry entries were deleted successfully.
+    // S_FALSE: Unregistration of this server's known entries was successful, but other entries still exist for this server's classes.
+    // SELFREG_E_TYPELIB: The server was unable to remove the entries of all the type libraries used by its classes.
+    // SELFREG_E_CLASS: The server was unable to remove the entries of all the object classes.
+};
 
 
 
