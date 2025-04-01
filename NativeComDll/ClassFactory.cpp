@@ -1,12 +1,18 @@
+#include "pch.h"
 #include <windows.h>
 #include <atomic>
 // NOTE: Make sure it is in the same directory as the enclosing project. Mismatch can occur when moving files across projects using solution view which normally does not keep solution view and file view structure in sync
 #include "MyComObject.h"
 #include "ClassFactory.h"
-#include <olectl.h>  // Including error codes for DllRegisterServer
+#include <olectl.h>  // Contains DllRegisterServer declaration and it's specific error codes
 #include <string>
 #include <type_traits>  // For template type assertion in string_bytes_count
+#include "Globals.h"
 
+// #include <combaseapi.h> // Needed for DllGetClassObject, DllCanUnloadNow
+
+
+ULONG dllReferences = 0;
 
 // Factory that creates Greeter instances
 GreeterClassFactory::GreeterClassFactory() {};
@@ -75,7 +81,9 @@ HRESULT STDMETHODCALLTYPE GreeterClassFactory::LockServer(BOOL) {
 
 // Exported function for CoCreateInstance
 // Ref: https://learn.microsoft.com/en-us/windows/win32/api/combaseapi/nf-combaseapi-dllgetclassobject
-HRESULT STDMETHODCALLTYPE DllGetClassObject(REFCLSID clsid, REFIID riid, LPVOID* ppv) {
+// STDAPI  DllGetClassObject(_In_ REFCLSID rclsid, _In_ REFIID riid, _Outptr_ LPVOID FAR* ppv);
+_Check_return_
+STDAPI DllGetClassObject(_In_ REFCLSID rclsid, _In_ REFIID riid, _Outptr_ LPVOID FAR* ppv) {
     // TODO: Add clsid to the mix 
     GreeterClassFactory* factory = new GreeterClassFactory();
     HRESULT hr = factory->QueryInterface(riid, ppv);
@@ -91,7 +99,8 @@ HRESULT STDMETHODCALLTYPE DllGetClassObject(REFCLSID clsid, REFIID riid, LPVOID*
 };
 
 // Ref: https://learn.microsoft.com/en-us/windows/win32/api/combaseapi/nf-combaseapi-dllcanunloadnow
-HRESULT STDMETHODCALLTYPE DllCanUnloadNow() {
+__control_entrypoint(DllExport)
+STDAPI DllCanUnloadNow(void) {
     if (dllReferences == 0) {
         return S_OK;
     }
@@ -105,7 +114,7 @@ HRESULT STDMETHODCALLTYPE DllCanUnloadNow() {
 **/
 template <typename T>
 DWORD string_bytes_count(T string_input) {
-    return (string_input.length() + 1) * sizeof(decltype(string_input)::value_type);
+    return (DWORD)((string_input.length() + 1) * sizeof(decltype(string_input)::value_type));
 }
 
 // +-------------------+-----------------------------------------------------+
@@ -274,13 +283,4 @@ HRESULT STDMETHODCALLTYPE DllUnregisterServer() {
 };
 
 
-
-
-
-
-
-
-
-
-
-// CoRegisterClassObject  // Ref: https://learn.microsoft.com/en-us/windows/win32/api/unknwn/nf-unknwn-iclassfactory-createinstance#:~:text=the%20CLSID%20must%20be%20registered%20in%20the%20system%20registry%20with%20the%20CoRegisterClassObject%20function
+// TODO (maybe?): CoRegisterClassObject  // Ref: https://learn.microsoft.com/en-us/windows/win32/api/unknwn/nf-unknwn-iclassfactory-createinstance#:~:text=the%20CLSID%20must%20be%20registered%20in%20the%20system%20registry%20with%20the%20CoRegisterClassObject%20function

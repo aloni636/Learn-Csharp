@@ -141,6 +141,7 @@
   <ItemGroup>
     <ClInclude Include="ClassFactory.h" />
     <ClInclude Include="framework.h" />
+    <ClInclude Include="Globals.h" />
     <ClInclude Include="MyComObject.h" />
     <ClInclude Include="pch.h" />
   </ItemGroup>

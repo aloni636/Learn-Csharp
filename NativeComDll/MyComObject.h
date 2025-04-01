@@ -1,6 +1,7 @@
 #pragma once
 #include <windows.h>
 #include <unknwn.h>  // For IUnknown
+#include <atomic>
 
 // Define a unique class and interface IDs for our custom COM object
 // {F5B1AC78-AF25-4B82-B93D-98F319A2A4B3}
@@ -21,7 +22,7 @@ static const IID IID_IGreeter = { /* d9c45dc8-9d13-4773-af01-2b9ff98dbb2a */
 
 // COM interface declaration
 struct IGreeter : public IUnknown {
-    virtual HRESULT STDMETHODCALLTYPE Greet(PWSTR name) = 0;  // low level call convention is set to standard - ensures ABI compatability, i.e. __stdcall
+    virtual HRESULT STDMETHODCALLTYPE Greet(PWSTR name) = 0;  // low level call convention is set to standard - ensures ABI compatibility, i.e. __stdcall
 };
 
 // COM implementer class

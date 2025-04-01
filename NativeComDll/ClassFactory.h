@@ -9,25 +9,22 @@
 #define NATIVECOMDLL_API __declspec(dllimport)
 #endif
 
-// Global Variables
-ULONG dllReferences = 0;  // Used to keep track of DLL managed objects and mark when the DLL is no longer used
-
 // Factory that creates Greeter instances
 class GreeterClassFactory : public IClassFactory {
 private:
     std::atomic<ULONG> refCount = 0;
-
 public:
+    // Constructor / Destructor
+    GreeterClassFactory();
+    ~GreeterClassFactory();
+
     // IUnknown
     HRESULT STDMETHODCALLTYPE QueryInterface(REFIID riid, void** ppvObject) override;
-
     ULONG STDMETHODCALLTYPE AddRef() override;
-
     ULONG STDMETHODCALLTYPE Release() override;
 
     // IClassFactory
     HRESULT STDMETHODCALLTYPE CreateInstance(IUnknown* pUnkOuter, REFIID riid, void** ppvObject) override;
-
     HRESULT STDMETHODCALLTYPE LockServer(BOOL) override;
 };
 
@@ -42,11 +39,14 @@ public:
 // +---------------------------------------------------------------------------------------------------------------------------- +
 
 // Exported function for CoCreateInstance
-HRESULT STDMETHODCALLTYPE DllGetClassObject(_In_ REFCLSID clsid, _In_ REFIID riid, _Out_ LPVOID* ppv);
-
+// NOTE: Windows already declares those functions in combaseapi.h
+// combaseapi.h
+// extern "C" NATIVECOMDLL_API HRESULT STDMETHODCALLTYPE DllGetClassObject(_In_ REFCLSID clsid, _In_ REFIID riid, _Out_ LPVOID* ppv);
+// 
 // DLL lifetime functions 
-HRESULT STDMETHODCALLTYPE DllCanUnloadNow();  // Tracks managed objects lifetimes to signal when the DLL is no longer necessary
-
-HRESULT STDMETHODCALLTYPE DllRegisterServer();  // Registration of COM server regisrty keys
-
-HRESULT STDMETHODCALLTYPE DllUnregisterServer();  // Deletion of COM sevrer regisrty keys
+// combaseapi.h
+// extern "C" NATIVECOMDLL_API HRESULT STDMETHODCALLTYPE DllCanUnloadNow();  // Tracks managed objects lifetimes to signal when the DLL is no longer necessary
+// olectl.h
+// extern "C" NATIVECOMDLL_API HRESULT STDMETHODCALLTYPE DllRegisterServer();  // Registration of COM server registry keys
+// olectl.h
+// extern "C" NATIVECOMDLL_API HRESULT STDMETHODCALLTYPE DllUnregisterServer();  // Deletion of COM server registry keys

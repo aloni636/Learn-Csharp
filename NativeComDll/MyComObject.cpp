@@ -1,7 +1,7 @@
+#include "pch.h"
 #include "MyComObject.h"
 #include <iostream>
-
-extern int dllReferences;  // Tells the linker to use dllReferences in ClassFactory.h (or anywhere else it is instantiated) 
+#include "Globals.h"
 
 // The COM object that implements IGreeter
 Greeter::Greeter() {};
