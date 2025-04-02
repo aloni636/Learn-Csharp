@@ -126,9 +126,10 @@ DWORD string_bytes_count(T string_input) {
 // | StringFromCLSID   | Converts CLSID to string format for use as key name |
 // | GetModuleFileName | Get path to your DLL for InprocServer32 value       |
 // +-------------------+-----------------------------------------------------+
-HRESULT STDMETHODCALLTYPE DllRegisterServer() {
+STDAPI STDMETHODCALLTYPE DllRegisterServer() {
+    OutputDebugStringW(L"Executing DllRegisterServer");
+    
     HRESULT hr;  // Result for windows operations in this function
-
     // HKEY_CLASSES_ROOT\CLSID\{clsid}\InprocServer32
     LPOLESTR clsidAsString; // Long Pointer to an OLE String
     hr = StringFromCLSID(CLSID_Greeter, &clsidAsString);
@@ -154,7 +155,7 @@ HRESULT STDMETHODCALLTYPE DllRegisterServer() {
     HKEY registryKeyHandle;
     DWORD keyExists;
     
-    // Q: What happens when I have an error midway? I need transcations
+    // Q: What happens when I have an error midway? I need transactions
     // Registry Key base
     hr = RegCreateKeyExW(  // Ref: https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regcreatekeyexa
         HKEY_CLASSES_ROOT,  // https://learn.microsoft.com/en-us/windows/win32/sysinfo/predefined-keys
@@ -162,8 +163,8 @@ HRESULT STDMETHODCALLTYPE DllRegisterServer() {
         0,
         NULL,  // legacy Windows 3.x feature, can be NULL
         REG_OPTION_NON_VOLATILE,
-        NULL,  // Access control is better handeled "via an installer or system-level policy."
-        NULL,  // Not Relevant when ACL is controled by the installer or system-level policy
+        NULL,  // Access control is better handled "via an installer or system-level policy."
+        NULL,  // Not Relevant when ACL is controlled by the installer or system-level policy
         &registryKeyHandle,
         &keyExists  // REG_CREATED_NEW_KEY | REG_OPENED_EXISTING_KEY
     );
@@ -229,7 +230,6 @@ HRESULT STDMETHODCALLTYPE DllRegisterServer() {
     // SELFREG_E_CLASS: The server was unable to complete the registration of all the object classes.
 };
 
-
 // +-----------------+---------------------------------------------------------------------+
 // | Function        | Purpose                                                             |
 // +-----------------+---------------------------------------------------------------------+
@@ -238,9 +238,9 @@ HRESULT STDMETHODCALLTYPE DllRegisterServer() {
 // | RegDeleteKeyExW | Alternative to RegDeleteTreeW if you're on older systems (optional) |
 // | CoTaskMemFree   | Free the result of StringFromCLSID                                  |
 // +-----------------+---------------------------------------------------------------------+
-HRESULT STDMETHODCALLTYPE DllUnregisterServer() {
+STDAPI STDMETHODCALLTYPE DllUnregisterServer() {
     HRESULT hr;  // Result for windows operations in this function
-
+    
     // HKEY_CLASSES_ROOT\CLSID\{clsid}\InprocServer32
     LPOLESTR clsidAsString;
     hr = StringFromCLSID(CLSID_Greeter, &clsidAsString);
@@ -282,5 +282,6 @@ HRESULT STDMETHODCALLTYPE DllUnregisterServer() {
     // SELFREG_E_CLASS: The server was unable to remove the entries of all the object classes.
 };
 
-
-// TODO (maybe?): CoRegisterClassObject  // Ref: https://learn.microsoft.com/en-us/windows/win32/api/unknwn/nf-unknwn-iclassfactory-createinstance#:~:text=the%20CLSID%20must%20be%20registered%20in%20the%20system%20registry%20with%20the%20CoRegisterClassObject%20function
+// TODO (maybe?): CoRegisterClassObject & CoRevokeClassObject // Ref: https://learn.microsoft.com/en-us/windows/win32/api/unknwn/nf-unknwn-iclassfactory-createinstance#:~:text=the%20CLSID%20must%20be%20registered%20in%20the%20system%20registry%20with%20the%20CoRegisterClassObject%20function
+// No... CoRegisterClassObject is used in runtime registration, voltile and dissaptes after shutdown of parent process.
+// DllRegisterServer is used for persistent registration.

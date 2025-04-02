@@ -39,14 +39,14 @@ public:
 // +---------------------------------------------------------------------------------------------------------------------------- +
 
 // Exported function for CoCreateInstance
-// NOTE: Windows already declares those functions in combaseapi.h
-// combaseapi.h
+// NOTE: Windows already declares those functions in combaseapi.h, redeclaring them in unnecessary and can causes linkage errors from signature redefinition
+// Implicitly in <windows.h> (combaseapi.h)
 // extern "C" NATIVECOMDLL_API HRESULT STDMETHODCALLTYPE DllGetClassObject(_In_ REFCLSID clsid, _In_ REFIID riid, _Out_ LPVOID* ppv);
 // 
 // DLL lifetime functions 
-// combaseapi.h
+// Implicitly in <windows.h> (combaseapi.h)
 // extern "C" NATIVECOMDLL_API HRESULT STDMETHODCALLTYPE DllCanUnloadNow();  // Tracks managed objects lifetimes to signal when the DLL is no longer necessary
-// olectl.h
+// Implicitly in <windows.h> (olectl.h)
 // extern "C" NATIVECOMDLL_API HRESULT STDMETHODCALLTYPE DllRegisterServer();  // Registration of COM server registry keys
-// olectl.h
+// Implicitly in <windows.h> (olectl.h)
 // extern "C" NATIVECOMDLL_API HRESULT STDMETHODCALLTYPE DllUnregisterServer();  // Deletion of COM server registry keys

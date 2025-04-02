@@ -1,0 +1,14 @@
+; Bypassing linkage conflicts between system headers like combaseapi.h (DllGetClassObject and DllCanUnloadNow) and dllexports in this project
+; Use `dumpbin /exports Childs-Play\x64\Debug\NativeComDll.dll` to view all DLL exports
+
+; Library Name:
+LIBRARY "NativeComDll"
+; Function Names:
+EXPORTS
+    ; COM servers are always loaded explicitly at runtime using GetProcAddress, never at link time.
+    ; Therefore, they can all be PRIVATE
+    ; Ref: https://stackoverflow.com/questions/18486020/why-com-dlls-exports-should-be-marked-private
+    DllRegisterServer   PRIVATE
+    DllUnregisterServer PRIVATE
+    DllGetClassObject   PRIVATE
+    DllCanUnloadNow     PRIVATE
