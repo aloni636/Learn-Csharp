@@ -139,10 +139,19 @@ STDAPI STDMETHODCALLTYPE DllRegisterServer() {
     CoTaskMemFree(clsidAsString);
     OutputDebugStringW((L"registrySubKeyPath = " + registrySubKeyPath + L"\n").c_str());
 
+    HMODULE currentModuleHandle = nullptr;
+    BOOL moduleHandleResult = GetModuleHandleEx(
+        GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS |  // Retrieve the handle to a specific address instead of "a handle to the file used to create the calling process (.exe file)."
+        GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,  // Don't need to call freeLibrary
+        (LPCWSTR)&DllRegisterServer,
+        &currentModuleHandle
+    );
+    if (moduleHandleResult == 0 or currentModuleHandle == nullptr) {
+        return SELFREG_E_CLASS;
+    }
     wchar_t currentModulePathBuffer[MAX_PATH];
-    DWORD modulePathLength = GetModuleFileName(
-        // 
-        NULL,  // Retrieves the path of the executable file of the current process
+    DWORD modulePathLength = GetModuleFileName(  // Ref: https://stackoverflow.com/questions/6924195/get-dll-path-at-runtime 
+        currentModuleHandle,  // NULL retrieves the path of the executable file of the CALLING process
         currentModulePathBuffer,
         MAX_PATH
     );
