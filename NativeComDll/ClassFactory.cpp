@@ -126,9 +126,7 @@ DWORD string_bytes_count(T string_input) {
 // | StringFromCLSID   | Converts CLSID to string format for use as key name |
 // | GetModuleFileName | Get path to your DLL for InprocServer32 value       |
 // +-------------------+-----------------------------------------------------+
-STDAPI STDMETHODCALLTYPE DllRegisterServer() {
-    OutputDebugStringW(L"Executing DllRegisterServer");
-    
+STDAPI STDMETHODCALLTYPE DllRegisterServer() {    
     HRESULT hr;  // Result for windows operations in this function
     // HKEY_CLASSES_ROOT\CLSID\{clsid}\InprocServer32
     LPOLESTR clsidAsString; // Long Pointer to an OLE String
@@ -139,9 +137,11 @@ STDAPI STDMETHODCALLTYPE DllRegisterServer() {
     std::wstring registrySubKeyPath = L"CLSID\\" + std::wstring(clsidAsString);
     // "The caller is responsible for freeing the memory allocated for the string by calling the CoTaskMemFree function." - Ref: https://learn.microsoft.com/en-us/windows/win32/api/combaseapi/nf-combaseapi-stringfromclsid
     CoTaskMemFree(clsidAsString);
+    OutputDebugStringW((L"registrySubKeyPath = " + registrySubKeyPath + L"\n").c_str());
 
     wchar_t currentModulePathBuffer[MAX_PATH];
     DWORD modulePathLength = GetModuleFileName(
+        // 
         NULL,  // Retrieves the path of the executable file of the current process
         currentModulePathBuffer,
         MAX_PATH
@@ -151,6 +151,7 @@ STDAPI STDMETHODCALLTYPE DllRegisterServer() {
         return SELFREG_E_CLASS;
     }
     std::wstring currentModulePath(currentModulePathBuffer);
+    OutputDebugStringW((L"currentModulePath = " + currentModulePath + L"\n").c_str());
     
     HKEY registryKeyHandle;
     DWORD keyExists;
@@ -249,7 +250,7 @@ STDAPI STDMETHODCALLTYPE DllUnregisterServer() {
     }
     std::wstring registrySubKeyPath = (L"CLSID\\" + std::wstring(clsidAsString));
     CoTaskMemFree(clsidAsString);
-
+    OutputDebugStringW((L"currentModulePath = " + registrySubKeyPath + L"\n").c_str());
     // HKEY registryKeyHandle;
     // RegOpenKeyExW(
     //     HKEY_CLASSES_ROOT,
