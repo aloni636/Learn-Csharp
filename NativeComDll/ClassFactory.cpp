@@ -8,6 +8,7 @@
 #include <string>
 #include <type_traits>  // For template type assertion in string_bytes_count
 #include "Globals.h"
+#include <comdef.h>  // for _com_error
 
 // #include <combaseapi.h> // Needed for DllGetClassObject, DllCanUnloadNow
 
@@ -107,6 +108,37 @@ STDAPI DllCanUnloadNow(void) {
     return S_FALSE;
 }
 
+
+static std::wstring formatHResultError(HRESULT hr) {
+    // Ref: https://stackoverflow.com/a/7008111
+    return _com_error(hr).ErrorMessage();
+}
+
+static std::wstring formatLStatusError(LSTATUS ls) {
+    wchar_t* messageBuffer = nullptr;
+
+    DWORD messageSize = FormatMessageW(
+        FORMAT_MESSAGE_ALLOCATE_BUFFER |  // 
+        FORMAT_MESSAGE_FROM_SYSTEM |
+        FORMAT_MESSAGE_IGNORE_INSERTS,
+        nullptr,
+        ls,
+        0, // Default language
+        reinterpret_cast<LPWSTR>(&messageBuffer),
+        0,
+        nullptr
+    );
+
+    if (messageSize==0 or messageBuffer == nullptr) {
+        return L"Could not format message of LSTATUS: " + std::to_wstring(ls);
+    }
+    
+    std::wstring message(messageBuffer);
+    LocalFree(messageBuffer);
+
+    return message;
+}
+
 // NOTE: Including null byte
 /**
 * @brief Calculates the total size in bytes of a given string (including null terminator).
@@ -127,11 +159,16 @@ DWORD string_bytes_count(T string_input) {
 // | GetModuleFileName | Get path to your DLL for InprocServer32 value       |
 // +-------------------+-----------------------------------------------------+
 STDAPI STDMETHODCALLTYPE DllRegisterServer() {    
-    HRESULT hr;  // Result for windows operations in this function
-    // HKEY_CLASSES_ROOT\CLSID\{clsid}\InprocServer32
+    HRESULT hr;  // Result for COM operations in this function
+    LSTATUS ls;  // Result for win32 operations in this function
+    // Registry paths:
+    // - HKEY_CLASSES_ROOT\CLSID\{clsid}
+    // - HKEY_CLASSES_ROOT\CLSID\{clsid}\InprocServer32
+    
     LPOLESTR clsidAsString; // Long Pointer to an OLE String
     hr = StringFromCLSID(CLSID_Greeter, &clsidAsString);
     if (FAILED(hr)) {
+        OutputDebugStringW(formatHResultError(hr).c_str());
         return SELFREG_E_CLASS;
     }
     std::wstring registrySubKeyPath = L"CLSID\\" + std::wstring(clsidAsString);
@@ -167,7 +204,7 @@ STDAPI STDMETHODCALLTYPE DllRegisterServer() {
     
     // Q: What happens when I have an error midway? I need transactions
     // Registry Key base
-    hr = RegCreateKeyExW(  // Ref: https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regcreatekeyexa
+    ls = RegCreateKeyExW(  // Ref: https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regcreatekeyexa
         HKEY_CLASSES_ROOT,  // https://learn.microsoft.com/en-us/windows/win32/sysinfo/predefined-keys
         registrySubKeyPath.c_str(),
         0,
@@ -178,7 +215,8 @@ STDAPI STDMETHODCALLTYPE DllRegisterServer() {
         &registryKeyHandle,
         &keyExists  // REG_CREATED_NEW_KEY | REG_OPENED_EXISTING_KEY
     );
-    if (FAILED(hr)) {
+    if (ls != ERROR_SUCCESS) {
+        OutputDebugStringW(formatLStatusError(ls).c_str());
         return SELFREG_E_CLASS;
     }
     if (keyExists == REG_CREATED_NEW_KEY) {
@@ -197,7 +235,7 @@ STDAPI STDMETHODCALLTYPE DllRegisterServer() {
     // ============================== //
 
     // Registry key InprocServer32 Subkey
-    hr = RegCreateKeyExW(  // Ref: https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regcreatekeyexa
+    ls = RegCreateKeyExW(  // Ref: https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regcreatekeyexa
         HKEY_CLASSES_ROOT,  // https://learn.microsoft.com/en-us/windows/win32/sysinfo/predefined-keys
         (registrySubKeyPath + L"\\InprocServer32").c_str(),
         0,
@@ -208,7 +246,8 @@ STDAPI STDMETHODCALLTYPE DllRegisterServer() {
         &registryKeyHandle,
         &keyExists
     );
-    if (FAILED(hr)) {
+    if (ls != ERROR_SUCCESS) {
+        OutputDebugStringW(formatLStatusError(ls).c_str());
         return SELFREG_E_CLASS;
     }
     if (keyExists == REG_CREATED_NEW_KEY) {
@@ -250,7 +289,7 @@ STDAPI STDMETHODCALLTYPE DllRegisterServer() {
 // +-----------------+---------------------------------------------------------------------+
 STDAPI STDMETHODCALLTYPE DllUnregisterServer() {
     HRESULT hr;  // Result for windows operations in this function
-    
+    LSTATUS ls;  // Result for win32 operations in this function
     // HKEY_CLASSES_ROOT\CLSID\{clsid}\InprocServer32
     LPOLESTR clsidAsString;
     hr = StringFromCLSID(CLSID_Greeter, &clsidAsString);
@@ -275,11 +314,12 @@ STDAPI STDMETHODCALLTYPE DllUnregisterServer() {
     // Q: Will it delete the entry itself or only it's children? Failing to delete itself will make `if (keyExists == REG_CREATED_NEW_KEY)` false and fail to populate the key after a (create -> delete -> create) cycle
     // Q: Why the docs have a special exception for when the key has values?
     //    "If the key has values, it must be opened with KEY_SET_VALUE or this function will fail with ERROR_ACCESS_DENIED."
-    LSTATUS treeDeleteResult = RegDeleteTreeW(
+    ls = RegDeleteTreeW(
         HKEY_CLASSES_ROOT,  // Run with admin to have this key populated with full delete permissions
         registrySubKeyPath.c_str()
     );
-    if (treeDeleteResult!= ERROR_SUCCESS and treeDeleteResult != ERROR_FILE_NOT_FOUND) {  // Failure if result is not success AND the key exists
+    if (ls != ERROR_SUCCESS and ls != ERROR_FILE_NOT_FOUND) {  // Failure if result is not success AND the key exists
+        OutputDebugStringW(formatLStatusError(ls).c_str());
         return SELFREG_E_CLASS;
     }
     return S_OK;
