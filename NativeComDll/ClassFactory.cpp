@@ -71,7 +71,7 @@ HRESULT STDMETHODCALLTYPE GreeterClassFactory::LockServer(BOOL) {
 }
 
 // +---------------------------------------------------------------------------------------------------------------------------- +
-// | Function            | In your DLL ?                | When it�s used                                                         |
+// | Function            | In your DLL ?                | When it's used                                                         |
 // | DllGetClassObject   | Yes                          | COM calls this to get your factory when someone calls CoCreateInstance |
 // | DllCanUnloadNow     | Yes                          | COM calls this to decide whether your DLL can be unloaded              |
 // | DllRegisterServer   | Optional but recommended     | regsvr32 calls this to write CLSIDs into registry                      |
@@ -186,7 +186,8 @@ static HRESULT getRegistrySubKeyPath(std::wstring &registrySubKeyPath) {
 // | StringFromCLSID   | Converts CLSID to string format for use as key name |
 // | GetModuleFileName | Get path to your DLL for InprocServer32 value       |
 // +-------------------+-----------------------------------------------------+
-STDAPI STDMETHODCALLTYPE DllRegisterServer() {    
+STDAPI STDMETHODCALLTYPE DllRegisterServer() {
+    // NOTE(Debug): To debug, 
     HRESULT hr;  // Result for COM operations in this function
     LSTATUS ls;  // Result for win32 operations in this function
 
@@ -224,13 +225,14 @@ STDAPI STDMETHODCALLTYPE DllRegisterServer() {
     
     // Q: What happens when I have an error midway? I need transactions
     // Registry Key base
+    // NOTE: You can view the registry edits using win+r -> regedit
     ls = RegCreateKeyExW(  // Ref: https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regcreatekeyexa
         REGISTRY_ROOT,  // https://learn.microsoft.com/en-us/windows/win32/sysinfo/predefined-keys
         registrySubKeyPath.c_str(),
         0,
         NULL,  // legacy Windows 3.x feature, can be NULL
         REG_OPTION_NON_VOLATILE,
-        NULL,  // Access control is better handled "via an installer or system-level policy."
+        KEY_ALL_ACCESS,  // NOTE: Can be NULL for first time creation of the key, but subsequent accesses should have KEY_ALL_ACCESS SAM! Failing so will lead to Access is denied errors (even when running with Admin privileges!)
         NULL,  // Not Relevant when ACL is controlled by the installer or system-level policy
         &registryKeyHandle,
         &keyExists  // REG_CREATED_NEW_KEY | REG_OPENED_EXISTING_KEY
@@ -239,17 +241,17 @@ STDAPI STDMETHODCALLTYPE DllRegisterServer() {
         OutputDebugStringW(formatLStatusError(ls).c_str());
         return SELFREG_E_CLASS;
     }
-    if (keyExists == REG_CREATED_NEW_KEY) {
-        const wchar_t* CLSID_TITLE = L"Greeter Class";
-        RegSetValueExW(
-            registryKeyHandle,
-            NULL,  // Set to (default)
-            0,
-            REG_SZ,  // Single line of string entry type
-            (const BYTE*)CLSID_TITLE,  // A null-terminated string. It's either a Unicode or an ANSI string, depending on whether you use the Unicode or ANSI functions.
-            strbytes(CLSID_TITLE)
-        );
-    }
+    // NOTE: When debugging I set & override Greeter Class registry entry each time because debugging is an iterative process
+    // if (keyExists == REG_CREATED_NEW_KEY) {}
+    const wchar_t* CLSID_TITLE = L"Greeter Class";
+    RegSetValueExW(
+        registryKeyHandle,
+        NULL,  // Set to (default)
+        0,
+        REG_SZ,  // Single line of string entry type
+        (const BYTE*)CLSID_TITLE,  // A null-terminated string. It's either a Unicode or an ANSI string, depending on whether you use the Unicode or ANSI functions.
+        strbytes(CLSID_TITLE)
+    );
     RegCloseKey(registryKeyHandle);  // Closing hKey resource no matter if it exists or not
 
     // ============================== //
@@ -261,7 +263,7 @@ STDAPI STDMETHODCALLTYPE DllRegisterServer() {
         0,
         NULL,
         REG_OPTION_NON_VOLATILE,
-        NULL,
+        KEY_ALL_ACCESS,
         NULL,
         &registryKeyHandle,
         &keyExists
@@ -270,25 +272,24 @@ STDAPI STDMETHODCALLTYPE DllRegisterServer() {
         OutputDebugStringW(formatLStatusError(ls).c_str());
         return SELFREG_E_CLASS;
     }
-    if (keyExists == REG_CREATED_NEW_KEY) {
-        RegSetValueExW(
-            registryKeyHandle,
-            NULL,  // Set to (default)
-            0,
-            REG_SZ,
-            (const BYTE*)currentModulePath.c_str(),  // `const BYTE*` casting is fine here
-            strbytes(currentModulePath)
-        );
-        const wchar_t* THREADING_MODEL = L"Apartment";
-        RegSetValueExW(
-            registryKeyHandle,
-            L"ThreadingModel",  // Set to (default)
-            0,
-            REG_SZ,
-            (const BYTE*)THREADING_MODEL,
-            strbytes(THREADING_MODEL)
-        );
-    }
+    // if (keyExists == REG_CREATED_NEW_KEY) {}
+    RegSetValueExW(
+        registryKeyHandle,
+        NULL,  // Set to (default)
+        0,
+        REG_SZ,
+        (const BYTE*)currentModulePath.c_str(),  // `const BYTE*` casting is fine here
+        strbytes(currentModulePath)
+    );
+    const wchar_t* THREADING_MODEL = L"Apartment";
+    RegSetValueExW(
+        registryKeyHandle,
+        L"ThreadingModel",  // Set to (default)
+        0,
+        REG_SZ,
+        (const BYTE*)THREADING_MODEL,
+        strbytes(THREADING_MODEL)
+    );
     RegCloseKey(registryKeyHandle);
 
     return S_OK;  // Q: I assume if the key is already created it means that I already registered the server, and it's ok. Is it correct?
