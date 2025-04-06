@@ -187,7 +187,9 @@ static HRESULT getRegistrySubKeyPath(std::wstring &registrySubKeyPath) {
 // | GetModuleFileName | Get path to your DLL for InprocServer32 value       |
 // +-------------------+-----------------------------------------------------+
 STDAPI STDMETHODCALLTYPE DllRegisterServer() {
-    // NOTE(Debug): To debug, 
+    // NOTE(Debug): To debug, Project -> Properites -> Debugging:
+    //   - Command: `C:\Windows\System32\regsvr32.exe`
+    //   - Command Arguments: `"$(TargetPath)"`
     HRESULT hr;  // Result for COM operations in this function
     LSTATUS ls;  // Result for win32 operations in this function
 
@@ -309,6 +311,9 @@ STDAPI STDMETHODCALLTYPE DllRegisterServer() {
 // | CoTaskMemFree   | Free the result of StringFromCLSID                                  |
 // +-----------------+---------------------------------------------------------------------+
 STDAPI STDMETHODCALLTYPE DllUnregisterServer() {
+    // NOTE(Debug): To debug, Project -> Properites -> Debugging:
+//   - Command: `C:\Windows\System32\regsvr32.exe`
+//   - Command Arguments: `/u "$(TargetPath)"`
     HRESULT hr;  // Result for windows operations in this function
     LSTATUS ls;  // Result for win32 operations in this function
     // HKEY_CLASSES_ROOT\CLSID\{clsid}\InprocServer32
