@@ -139,14 +139,21 @@ static std::wstring formatLStatusError(LSTATUS ls) {
     return message;
 }
 
-// NOTE: Including null byte
-/**
-* @brief Calculates the total size in bytes of a given string (including null terminator).
-* @tparam T Can be std::string or std::wstring
-**/
-template <typename T>
-DWORD string_bytes_count(T string_input) {
-    return (DWORD)((string_input.length() + 1) * sizeof(decltype(string_input)::value_type));
+
+static DWORD strbytes(const std::wstring str) {
+    return (str.length() + 1) * sizeof(wchar_t);
+}
+
+static DWORD strbytes(const std::string str) {
+    return (str.length() + 1) * sizeof(char);
+}
+
+static DWORD strbytes(const wchar_t* str) {
+    return str ? (wcslen(str) + 1) * sizeof(wchar_t) : 0;
+}
+
+static DWORD strbytes(const char* str) {
+    return str ? (strlen(str) + 1) * sizeof(char) : 0;
 }
 
 const HKEY REGISTRY_ROOT = HKEY_CURRENT_USER;
@@ -233,14 +240,14 @@ STDAPI STDMETHODCALLTYPE DllRegisterServer() {
         return SELFREG_E_CLASS;
     }
     if (keyExists == REG_CREATED_NEW_KEY) {
-        std::string CLSID_TITLE = "Greeter Class";  // Automatically null terminated
+        const wchar_t* CLSID_TITLE = L"Greeter Class";
         RegSetValueExW(
             registryKeyHandle,
             NULL,  // Set to (default)
             0,
             REG_SZ,  // Single line of string entry type
-            (const BYTE*)CLSID_TITLE.c_str(),
-            string_bytes_count(CLSID_TITLE)
+            (const BYTE*)CLSID_TITLE,  // A null-terminated string. It's either a Unicode or an ANSI string, depending on whether you use the Unicode or ANSI functions.
+            strbytes(CLSID_TITLE)
         );
     }
     RegCloseKey(registryKeyHandle);  // Closing hKey resource no matter if it exists or not
@@ -270,16 +277,16 @@ STDAPI STDMETHODCALLTYPE DllRegisterServer() {
             0,
             REG_SZ,
             (const BYTE*)currentModulePath.c_str(),  // `const BYTE*` casting is fine here
-            string_bytes_count(currentModulePath)
+            strbytes(currentModulePath)
         );
-        std::wstring THREADING_MODEL = L"Apartment";  // Can use const wchar_t* to avoid memory allocation
+        const wchar_t* THREADING_MODEL = L"Apartment";
         RegSetValueExW(
             registryKeyHandle,
             L"ThreadingModel",  // Set to (default)
             0,
             REG_SZ,
-            (const BYTE*)THREADING_MODEL.c_str(),
-            string_bytes_count(THREADING_MODEL)
+            (const BYTE*)THREADING_MODEL,
+            strbytes(THREADING_MODEL)
         );
     }
     RegCloseKey(registryKeyHandle);
