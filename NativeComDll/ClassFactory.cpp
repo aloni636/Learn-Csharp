@@ -149,6 +149,27 @@ DWORD string_bytes_count(T string_input) {
     return (DWORD)((string_input.length() + 1) * sizeof(decltype(string_input)::value_type));
 }
 
+const HKEY REGISTRY_ROOT = HKEY_CURRENT_USER;
+
+static HRESULT getRegistrySubKeyPath(std::wstring &registrySubKeyPath) {
+    // Registry paths:
+    // - HKEY_CURRENT_USER\Software\Classes\CLSID\{clsid}
+    // - HKEY_CURRENT_USER\Software\Classes\CLSID\{clsid}\InprocServer32
+    
+    LPOLESTR clsidAsString; // Long Pointer to an OLE String
+    HRESULT hr = StringFromCLSID(CLSID_Greeter, &clsidAsString);
+    if (SUCCEEDED(hr)) {
+        // Ref (computer-wide (admin) and per-user (non-admin)): https://learn.microsoft.com/en-us/windows/win32/com/classes-and-servers
+        registrySubKeyPath = L"Software\\Classes\\CLSID\\" + std::wstring(clsidAsString);
+        CoTaskMemFree(clsidAsString);  // "The caller is responsible for freeing the memory allocated for the string by calling the CoTaskMemFree function." - Ref: https://learn.microsoft.com/en-us/windows/win32/api/combaseapi/nf-combaseapi-stringfromclsid
+        OutputDebugStringW((L"registrySubKeyPath = " + registrySubKeyPath + L"\n").c_str());
+    }
+    else {
+        OutputDebugStringW((L"Failed to convert CLSID to wstring: " + formatHResultError(hr)).c_str());
+    }
+    return hr;
+}
+
 // +-------------------+-----------------------------------------------------+
 // | Function          | Purpose                                             |
 // +-------------------+-----------------------------------------------------+
@@ -161,26 +182,18 @@ DWORD string_bytes_count(T string_input) {
 STDAPI STDMETHODCALLTYPE DllRegisterServer() {    
     HRESULT hr;  // Result for COM operations in this function
     LSTATUS ls;  // Result for win32 operations in this function
-    // Registry paths:
-    // - HKEY_CLASSES_ROOT\CLSID\{clsid}
-    // - HKEY_CLASSES_ROOT\CLSID\{clsid}\InprocServer32
-    
-    LPOLESTR clsidAsString; // Long Pointer to an OLE String
-    hr = StringFromCLSID(CLSID_Greeter, &clsidAsString);
-    if (FAILED(hr)) {
-        OutputDebugStringW(formatHResultError(hr).c_str());
+
+    std::wstring registrySubKeyPath;
+    hr = getRegistrySubKeyPath(registrySubKeyPath);
+    if FAILED(hr) {
         return SELFREG_E_CLASS;
     }
-    std::wstring registrySubKeyPath = L"CLSID\\" + std::wstring(clsidAsString);
-    // "The caller is responsible for freeing the memory allocated for the string by calling the CoTaskMemFree function." - Ref: https://learn.microsoft.com/en-us/windows/win32/api/combaseapi/nf-combaseapi-stringfromclsid
-    CoTaskMemFree(clsidAsString);
-    OutputDebugStringW((L"registrySubKeyPath = " + registrySubKeyPath + L"\n").c_str());
 
     HMODULE currentModuleHandle = nullptr;
     BOOL moduleHandleResult = GetModuleHandleEx(
         GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS |  // Retrieve the handle to a specific address instead of "a handle to the file used to create the calling process (.exe file)."
         GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,  // Don't need to call freeLibrary
-        (LPCWSTR)&DllRegisterServer,
+        (LPCWSTR)&DllRegisterServer,  // Or any other function pointer in this DLL module
         &currentModuleHandle
     );
     if (moduleHandleResult == 0 or currentModuleHandle == nullptr) {
@@ -205,7 +218,7 @@ STDAPI STDMETHODCALLTYPE DllRegisterServer() {
     // Q: What happens when I have an error midway? I need transactions
     // Registry Key base
     ls = RegCreateKeyExW(  // Ref: https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regcreatekeyexa
-        HKEY_CLASSES_ROOT,  // https://learn.microsoft.com/en-us/windows/win32/sysinfo/predefined-keys
+        REGISTRY_ROOT,  // https://learn.microsoft.com/en-us/windows/win32/sysinfo/predefined-keys
         registrySubKeyPath.c_str(),
         0,
         NULL,  // legacy Windows 3.x feature, can be NULL
@@ -236,7 +249,7 @@ STDAPI STDMETHODCALLTYPE DllRegisterServer() {
 
     // Registry key InprocServer32 Subkey
     ls = RegCreateKeyExW(  // Ref: https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regcreatekeyexa
-        HKEY_CLASSES_ROOT,  // https://learn.microsoft.com/en-us/windows/win32/sysinfo/predefined-keys
+        REGISTRY_ROOT,  // https://learn.microsoft.com/en-us/windows/win32/sysinfo/predefined-keys
         (registrySubKeyPath + L"\\InprocServer32").c_str(),
         0,
         NULL,
@@ -291,14 +304,12 @@ STDAPI STDMETHODCALLTYPE DllUnregisterServer() {
     HRESULT hr;  // Result for windows operations in this function
     LSTATUS ls;  // Result for win32 operations in this function
     // HKEY_CLASSES_ROOT\CLSID\{clsid}\InprocServer32
-    LPOLESTR clsidAsString;
-    hr = StringFromCLSID(CLSID_Greeter, &clsidAsString);
+
+    std::wstring registrySubKeyPath;
+    hr = getRegistrySubKeyPath(registrySubKeyPath);
     if (FAILED(hr)) {
         return SELFREG_E_CLASS;
     }
-    std::wstring registrySubKeyPath = (L"CLSID\\" + std::wstring(clsidAsString));
-    CoTaskMemFree(clsidAsString);
-    OutputDebugStringW((L"currentModulePath = " + registrySubKeyPath + L"\n").c_str());
     // HKEY registryKeyHandle;
     // RegOpenKeyExW(
     //     HKEY_CLASSES_ROOT,
@@ -315,7 +326,7 @@ STDAPI STDMETHODCALLTYPE DllUnregisterServer() {
     // Q: Why the docs have a special exception for when the key has values?
     //    "If the key has values, it must be opened with KEY_SET_VALUE or this function will fail with ERROR_ACCESS_DENIED."
     ls = RegDeleteTreeW(
-        HKEY_CLASSES_ROOT,  // Run with admin to have this key populated with full delete permissions
+        REGISTRY_ROOT,  // Run with admin to have this key populated with full delete permissions
         registrySubKeyPath.c_str()
     );
     if (ls != ERROR_SUCCESS and ls != ERROR_FILE_NOT_FOUND) {  // Failure if result is not success AND the key exists
