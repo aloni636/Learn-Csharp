@@ -11,7 +11,7 @@ int main()
     // Scoping all COM operations between CoInitializeEx and CoUninitialize guarantees RAII deallocations (i.e. CComPtr<IGreeter>) BEFORE releasiing the core COM libraries
     {
         if (FAILED(hr)) { return EXIT_FAILURE; }
-        IGreeter* pGreeter = nullptr;
+        IGreeter* pGreeter = nullptr;  // raw pointer to Greeter
         hr = CoCreateInstance(CLSID_Greeter, nullptr, CLSCTX_INPROC_SERVER, IID_IGreeter, (void**)&pGreeter);
         if (FAILED(hr)) {
             std::cout << "[C]: Failed to create instance of Greeter.\n";
@@ -20,7 +20,7 @@ int main()
         pGreeter->Greet(L"Elyasaf");
         pGreeter->Release();
 
-        CComPtr<IGreeter> spGreeter;
+        CComPtr<IGreeter> spGreeter;  // smart pointer to Greeter
         hr = spGreeter.CoCreateInstance(__uuidof(Greeter));
         if (FAILED(hr)) {
             std::cout << "[C++]: Failed to create instance of Greeter.\n";

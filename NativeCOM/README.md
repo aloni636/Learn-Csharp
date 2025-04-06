@@ -7,4 +7,5 @@ You can find debug instructions for `NativeComDLL` and `NativeComClient` individ
 ## Build Instructions
 
 A. Register the COM objects in `NativeComDll` using `regsvr32.exe .\x64\Debug\NativeComDll.dll`
-B. 
+B. Set `NativeComClient` as the **startup project**.
+B. Press *f5* for debugging or *ctrl+f5* to run without a debugger.
