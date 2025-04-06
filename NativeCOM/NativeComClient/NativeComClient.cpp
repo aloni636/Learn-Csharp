@@ -1,20 +1,33 @@
-// NativeComClient.cpp : This file contains the 'main' function. Program execution begins and ends there.
-//
-
 #include <iostream>
+#include <windows.h>
+#include <atlbase.h>  // RAII COM memory management
+#include "GreeterClass.h"  // NOTE: To include from another project use additional include directories in Project -> Properties -> C/C++ -> General -> Additional Include Directories: ../NativeComDll
 
 int main()
 {
-    std::cout << "Hello World!\n";
+    HRESULT hr;
+    std::cout << "[C/C++]: Starting COM session\n";
+    hr = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
+    // Scoping all COM operations between CoInitializeEx and CoUninitialize guarantees RAII deallocations (i.e. CComPtr<IGreeter>) BEFORE releasiing the core COM libraries
+    {
+        if (FAILED(hr)) { return EXIT_FAILURE; }
+        IGreeter* pGreeter = nullptr;
+        hr = CoCreateInstance(CLSID_Greeter, nullptr, CLSCTX_INPROC_SERVER, IID_IGreeter, (void**)&pGreeter);
+        if (FAILED(hr)) {
+            std::cout << "[C]: Failed to create instance of Greeter.\n";
+            return EXIT_FAILURE;
+        }
+        pGreeter->Greet(L"Elyasaf");
+        pGreeter->Release();
+
+        CComPtr<IGreeter> spGreeter;
+        hr = spGreeter.CoCreateInstance(__uuidof(Greeter));
+        if (FAILED(hr)) {
+            std::cout << "[C++]: Failed to create instance of Greeter.\n";
+            return EXIT_FAILURE;
+        }
+        spGreeter->Greet(L"Elyasaf");
+    }
+    CoUninitialize();
+    std::cout << "[C/C++]: Closing COM session\n";
 }
-
-// Run program: Ctrl + F5 or Debug > Start Without Debugging menu
-// Debug program: F5 or Debug > Start Debugging menu
-
-// Tips for Getting Started: 
-//   1. Use the Solution Explorer window to add/manage files
-//   2. Use the Team Explorer window to connect to source control
-//   3. Use the Output window to see build output and other messages
-//   4. Use the Error List window to view errors
-//   5. Go to Project > Add New Item to create new code files, or Project > Add Existing Item to add existing code files to the project
-//   6. In the future, to open this project again, go to File > Open > Project and select the .sln file

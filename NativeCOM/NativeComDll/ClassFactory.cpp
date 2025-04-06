@@ -2,18 +2,20 @@
 #include <windows.h>
 #include <atomic>
 // NOTE: Make sure it is in the same directory as the enclosing project. Mismatch can occur when moving files across projects using solution view which normally does not keep solution view and file view structure in sync
-#include "MyComObject.h"
+#include "GreeterClass.h"
 #include "ClassFactory.h"
 #include <olectl.h>  // Contains DllRegisterServer declaration and it's specific error codes
 #include <string>
 #include <type_traits>  // For template type assertion in string_bytes_count
 #include "Globals.h"
 #include <comdef.h>  // for _com_error
-
+#include <iostream>
+#include <atomic>
 // #include <combaseapi.h> // Needed for DllGetClassObject, DllCanUnloadNow
 
 
-ULONG dllReferences = 0;
+std::atomic<ULONG> dllReferences = 0;
+std::atomic<ULONG> locksCount = 0;
 
 // Factory that creates Greeter instances
 GreeterClassFactory::GreeterClassFactory() {};
@@ -66,8 +68,18 @@ HRESULT STDMETHODCALLTYPE GreeterClassFactory::CreateInstance(IUnknown* pUnkOute
     return S_OK;
 }
 
-HRESULT STDMETHODCALLTYPE GreeterClassFactory::LockServer(BOOL) {
-    return E_FAIL;  // Not implemented; TODO: implement dll/exe load and code this method
+/*
+The process that locks the object application is responsible for unlocking it.
+Ref: https://learn.microsoft.com/en-us/windows/win32/api/unknwn/nf-unknwn-iclassfactory-lockserver
+*/
+HRESULT STDMETHODCALLTYPE GreeterClassFactory::LockServer(BOOL flock) {
+    if (flock) {
+        locksCount++;
+    }
+    else {
+        locksCount--;
+    }
+    return S_OK;
 }
 
 // +---------------------------------------------------------------------------------------------------------------------------- +
@@ -102,7 +114,8 @@ STDAPI DllGetClassObject(_In_ REFCLSID rclsid, _In_ REFIID riid, _Outptr_ LPVOID
 // Ref: https://learn.microsoft.com/en-us/windows/win32/api/combaseapi/nf-combaseapi-dllcanunloadnow
 __control_entrypoint(DllExport)
 STDAPI DllCanUnloadNow(void) {
-    if (dllReferences == 0) {
+    std::cout << "[COM]: Checking if DLL can be unloaded: " << dllReferences << " DLL refs, " << locksCount << " locks\n";
+    if (dllReferences == 0  && locksCount == 0) {
         return S_OK;
     }
     return S_FALSE;

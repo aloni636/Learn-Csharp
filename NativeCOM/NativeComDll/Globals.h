@@ -1,5 +1,6 @@
 #pragma once
 #include <windows.h>
+#include <atomic>
 
 // Global variables
-extern ULONG dllReferences;  // Used to keep track of DLL managed objects and mark when the DLL is no longer used
+extern std::atomic<ULONG> dllReferences;  // Used to keep track of DLL managed objects and mark when the DLL is no longer used

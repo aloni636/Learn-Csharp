@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "MyComObject.h"
+#include "GreeterClass.h"
 #include <iostream>
 #include "Globals.h"
 
@@ -27,20 +27,25 @@ HRESULT Greeter::QueryInterface(REFIID riid, void** ppvObject) {
     return S_OK;
 };
 
-ULONG Greeter::AddRef() { return ++refCount; };
+ULONG Greeter::AddRef() { 
+    std::cout << "[COM]: Incrementing reference count of Greeter (" << this << "): " << this->refCount+1 << " refs\n";
+    return ++refCount; 
+};
 
 ULONG Greeter::Release() { 
     ULONG count = --refCount;  // storing in new variable to successfully return after delete
+    std::cout << "[COM]: Decrementing reference count of Greeter (" << this << "): " << count << " refs\n";
     if (count == 0) {
         dllReferences--;
+        std::cout << "[COM]: Deleting Greeter (" << this << ").\n";
         delete this;
     }
     return count;
 };
 
 // Business Logic
-HRESULT Greeter::Greet(PWSTR name) {
-    std::wcout << L"Greeting, " << name << L"!";
+HRESULT Greeter::Greet(LPCWSTR name) {
+    std::wcout << L"Greeting, " << name << L"!\n";
     return S_OK;
 };
 

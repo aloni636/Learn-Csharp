@@ -21,12 +21,13 @@ static const IID IID_IGreeter = { /* d9c45dc8-9d13-4773-af01-2b9ff98dbb2a */
 };
 
 // COM interface declaration
-struct IGreeter : public IUnknown {
-    virtual HRESULT STDMETHODCALLTYPE Greet(PWSTR name) = 0;  // low level call convention is set to standard - ensures ABI compatibility, i.e. __stdcall
+interface __declspec(uuid("d9c45dc8-9d13-4773-af01-2b9ff98dbb2a")) IGreeter : public IUnknown {
+    virtual HRESULT STDMETHODCALLTYPE Greet(LPCWSTR name) = 0;  // low level call convention is set to standard - ensures ABI compatibility, i.e. __stdcall
 };
 
 // COM implementer class
-class Greeter : public IGreeter {
+// NOTE: This uuid is CLSID_Greeter and is used when using __uuidof(Greeter)
+class __declspec(uuid("3233bc95-fb3d-4a97-aa10-a717c62f4af7")) Greeter : public IGreeter {
 private:
     std::atomic<ULONG> refCount = 0;
 public:
@@ -36,7 +37,7 @@ public:
     ULONG STDMETHODCALLTYPE Release() override;
 
     // Business logic
-    HRESULT STDMETHODCALLTYPE Greet(PWSTR name) override;
+    HRESULT STDMETHODCALLTYPE Greet(LPCWSTR name) override;
 
     // Constructor/Destructor
     Greeter();

@@ -24,7 +24,7 @@
     <ClInclude Include="ClassFactory.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="MyComObject.h">
+    <ClInclude Include="GreeterClass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Globals.h">
@@ -41,14 +41,14 @@
     <ClCompile Include="ClassFactory.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="MyComObject.cpp">
+    <ClCompile Include="GreeterClass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="README.md" />
     <None Include="NativeComDll.def">
-      <Filter>Source Files</Filter>
+      <Filter>Header Files</Filter>
     </None>
   </ItemGroup>
 </Project>
