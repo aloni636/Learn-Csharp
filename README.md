@@ -26,6 +26,7 @@ The solution structure is as follows:
     - [X] Inheritance
     - [X] Templates
     - [X] Includes
+    - [ ] Concurrent Programming
 - [X] **C++/CLI**
     - [X] Data Structures
     - [X] C++ Structs & Classes
