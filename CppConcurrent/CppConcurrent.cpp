@@ -13,12 +13,22 @@
 
 namespace chrono = std::chrono;
 
-//  Concept                 C++ Tool                      Use                                              
-// ----------------------- ----------------------------- ------------------------------------------------- 
-//  Basic thread            std::thread                   Run a function in parallel                       
-//  Safe shared access      std::mutex, std::lock_guard   Prevent concurrent data access bugs              
-//  Task signaling          std::condition_variable       Wake threads when new work is available          
-//  Cancellation / status   std::atomic<bool>             Shared flag between threads, safe to read/write  
+//   Concept / Model         Tool / Library                  Use / Summary                                 
+//  ----------------------- ------------------------------- ---------------------------------------------- 
+//   Basic threads           std::thread                     Manual thread creation                        
+//   Mutex & lock            std::mutex, std::lock_guard     Protect shared data                           
+//   Signaling               std::condition_variable         Notify threads of events                      
+//   Atomic flags            std::atomic, std::atomic_flag   Lock-free shared state                        
+//   Simple async            std::async, std::future         Fire-and-wait for result                      
+//   Manual async            std::promise, std::future       Producer-consumer sync                        
+//   Shared result           std::shared_future              Allow multiple readers                        
+//   Sync point              std::latch, std::barrier        Sync threads at a point                       
+//   Safe threads + cancel   std::jthread, std::stop_token   Join-on-exit + stop request                   
+//   Coroutines              co_await, co_yield              Lightweight async syntax                      
+//   Composable async        Senders & Receivers             Modular async pipelines                       
+//   S&R reference impl      stdexec (NVIDIA)                Header-only, standards-aligned                
+//   Full async runtime      HPX                             Parallel STL + futures + distributed runtime  
+
 
 class RandomSampler {
 public:
