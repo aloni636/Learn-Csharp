@@ -1,0 +1,36 @@
+// AtlComDll.idl : IDL source for AtlComDll
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (AtlComDll.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+[
+	object,
+	uuid(95a4b435-2515-4038-86ca-017ba9b8b38f),
+	dual,
+	nonextensible,
+	pointer_default(unique)
+]
+interface IGreeter : IDispatch
+{
+};
+[
+	uuid(f5eb3f19-113a-4265-93d5-83cab932c7b5),
+	version(1.0),
+]
+library AtlComDllLib
+{
+	importlib("stdole2.tlb");
+	[
+		uuid(7e88194a-d593-4257-9394-3790fa8c3853)
+	]
+	coclass Greeter
+	{
+		[default] interface IGreeter;
+	};
+};
+
+import "shobjidl.idl";

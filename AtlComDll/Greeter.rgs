@@ -1,0 +1,16 @@
+HKCR
+{
+	NoRemove CLSID
+	{
+		ForceRemove {7e88194a-d593-4257-9394-3790fa8c3853} = s 'Greeter class'
+		{
+			ForceRemove Programmable
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Apartment'
+			}
+			TypeLib = s '{f5eb3f19-113a-4265-93d5-83cab932c7b5}'
+			Version = s '1.0'
+		}
+	}
+}
