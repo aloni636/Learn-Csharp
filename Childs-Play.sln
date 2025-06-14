@@ -73,6 +73,9 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CppConcurrent", "CppConcurrent\CppConcurrent.vcxproj", "{14266852-BB1C-4893-913F-B40AC157EF1F}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ATL", "ATL", "{16FD1C72-B0F3-46FC-9230-A2A1D45D3BFE}"
+	ProjectSection(SolutionItems) = preProject
+		README_ATL.md = README_ATL.md
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AtlComDll", "AtlComDll\AtlComDll.vcxproj", "{23F7DBE7-C1AB-D640-EBB5-5E47A0B47646}"
 EndProject
