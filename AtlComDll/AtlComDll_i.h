@@ -96,6 +96,9 @@ EXTERN_C const IID IID_IGreeter;
     IGreeter : public IDispatch
     {
     public:
+        virtual /* [id] */ HRESULT STDMETHODCALLTYPE Greet( 
+            /* [in] */ BSTR name) = 0;
+        
     };
     
     
@@ -161,6 +164,11 @@ EXTERN_C const IID IID_IGreeter;
             /* [annotation][out] */ 
             _Out_opt_  UINT *puArgErr);
         
+        DECLSPEC_XFGVIRT(IGreeter, Greet)
+        /* [id] */ HRESULT ( STDMETHODCALLTYPE *Greet )( 
+            IGreeter * This,
+            /* [in] */ BSTR name);
+        
         END_INTERFACE
     } IGreeterVtbl;
 
@@ -197,6 +205,9 @@ EXTERN_C const IID IID_IGreeter;
     ( (This)->lpVtbl -> Invoke(This,dispIdMember,riid,lcid,wFlags,pDispParams,pVarResult,pExcepInfo,puArgErr) ) 
 
 
+#define IGreeter_Greet(This,name)	\
+    ( (This)->lpVtbl -> Greet(This,name) ) 
+
 #endif /* COBJMACROS */
 
 
@@ -228,6 +239,16 @@ Greeter;
 #endif /* __AtlComDllLib_LIBRARY_DEFINED__ */
 
 /* Additional Prototypes for ALL interfaces */
+
+unsigned long             __RPC_USER  BSTR_UserSize(     unsigned long *, unsigned long            , BSTR * ); 
+unsigned char * __RPC_USER  BSTR_UserMarshal(  unsigned long *, unsigned char *, BSTR * ); 
+unsigned char * __RPC_USER  BSTR_UserUnmarshal(unsigned long *, unsigned char *, BSTR * ); 
+void                      __RPC_USER  BSTR_UserFree(     unsigned long *, BSTR * ); 
+
+unsigned long             __RPC_USER  BSTR_UserSize64(     unsigned long *, unsigned long            , BSTR * ); 
+unsigned char * __RPC_USER  BSTR_UserMarshal64(  unsigned long *, unsigned char *, BSTR * ); 
+unsigned char * __RPC_USER  BSTR_UserUnmarshal64(unsigned long *, unsigned char *, BSTR * ); 
+void                      __RPC_USER  BSTR_UserFree64(     unsigned long *, BSTR * ); 
 
 /* end of Additional Prototypes */
 

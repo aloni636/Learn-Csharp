@@ -16,6 +16,7 @@ import "ocidl.idl";
 ]
 interface IGreeter : IDispatch
 {
+	[id(1)] HRESULT Greet([in] BSTR name);
 };
 [
 	uuid(f5eb3f19-113a-4265-93d5-83cab932c7b5),

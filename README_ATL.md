@@ -35,3 +35,4 @@
     regsvr32.exe /u .\x64\Debug\AtlComDll.dll
     ```
 
+# Adding Methods

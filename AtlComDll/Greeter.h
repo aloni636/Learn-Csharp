@@ -53,6 +53,7 @@ public:
 
 
 
+	STDMETHOD(Greet)(BSTR name);
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(Greeter), CGreeter)
