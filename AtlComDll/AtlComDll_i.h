@@ -71,6 +71,18 @@ typedef struct Greeter Greeter;
 #endif 	/* __Greeter_FWD_DEFINED__ */
 
 
+#ifndef __StringGenerator_FWD_DEFINED__
+#define __StringGenerator_FWD_DEFINED__
+
+#ifdef __cplusplus
+typedef class StringGenerator StringGenerator;
+#else
+typedef struct StringGenerator StringGenerator;
+#endif /* __cplusplus */
+
+#endif 	/* __StringGenerator_FWD_DEFINED__ */
+
+
 /* header files for imported files */
 #include "oaidl.h"
 #include "ocidl.h"
@@ -235,6 +247,14 @@ EXTERN_C const CLSID CLSID_Greeter;
 
 class DECLSPEC_UUID("7e88194a-d593-4257-9394-3790fa8c3853")
 Greeter;
+#endif
+
+EXTERN_C const CLSID CLSID_StringGenerator;
+
+#ifdef __cplusplus
+
+class DECLSPEC_UUID("ff75d3d2-276d-4376-978d-ababb00e2ea2")
+StringGenerator;
 #endif
 #endif /* __AtlComDllLib_LIBRARY_DEFINED__ */
 

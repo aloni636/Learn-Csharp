@@ -222,6 +222,7 @@
     <ClInclude Include="Greeter.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Resource.h" />
+    <ClInclude Include="StringGenerator.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
@@ -261,6 +262,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="StringGenerator.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="AtlComDll.rc" />
@@ -269,6 +271,7 @@
     <None Include="AtlComDll.def" />
     <None Include="AtlComDll.rgs" />
     <None Include="Greeter.rgs" />
+    <None Include="StringGenerator.rgs" />
   </ItemGroup>
   <ItemGroup>
     <Midl Include="AtlComDll.idl" />

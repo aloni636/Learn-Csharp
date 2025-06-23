@@ -32,6 +32,14 @@ library AtlComDllLib
 	{
 		[default] interface IGreeter;
 	};
+	[
+		uuid(ff75d3d2-276d-4376-978d-ababb00e2ea2)
+	]
+	coclass StringGenerator
+	{
+		// NOTE: No need to declare IEnumString or make the interface [default] because IEnumString is not scriptable (i.e. duel interface)
+		interface IEnumString;
+	};
 };
 
 import "shobjidl.idl";

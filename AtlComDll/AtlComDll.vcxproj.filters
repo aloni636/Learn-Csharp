@@ -40,6 +40,9 @@
     <ClInclude Include="Greeter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="StringGenerator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AtlComDll.cpp">
@@ -57,6 +60,9 @@
     <ClCompile Include="Greeter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="StringGenerator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="AtlComDll.rc">
@@ -71,6 +77,9 @@
       <Filter>Source Files</Filter>
     </None>
     <None Include="Greeter.rgs">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="StringGenerator.rgs">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>
