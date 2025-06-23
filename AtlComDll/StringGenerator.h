@@ -3,9 +3,15 @@
 #pragma once
 #include "resource.h"       // main symbols
 
-
-
 #include "AtlComDll_i.h"
+
+#include <fstream>
+#include <string>
+#include <filesystem>
+#include <iostream>
+#include <random>
+
+namespace fs = std::filesystem;
 
 
 
@@ -23,6 +29,43 @@ class ATL_NO_VTABLE CStringGenerator :
 	public CComCoClass<CStringGenerator, &CLSID_StringGenerator>,
 	public IEnumString
 {
+private:
+    const std::wstring WORDS_FILE_NAME = L"google-10000-english-no-swears.txt";
+    fs::path words_path;
+	fs::path get_words_path() 
+	{
+        if (!words_path.empty()) { return words_path; }
+		wchar_t module_path_buffer[MAX_PATH] = {};
+		DWORD path_length= GetModuleFileNameW(_AtlBaseModule.GetModuleInstance(), module_path_buffer, _countof(module_path_buffer));
+        fs::path module_path(std::wstring(module_path_buffer, path_length));
+		words_path = module_path.parent_path() / L"Data" / WORDS_FILE_NAME;
+		return words_path;
+	}
+
+	std::vector<std::wstring> words;
+	bool load_words()
+	{
+		fs::path path = get_words_path();
+        std::wifstream file(path);
+		if (!file.is_open()) { return false; }
+		std::wstring line;
+		while (std::getline(file, line)) {
+			words.push_back(line);
+		}
+		return true;
+	}
+
+	int get_random_index() const
+	{
+		if (words.empty()) { return -1; }
+		static std::random_device rd;
+		static std::mt19937 gen(rd());
+		std::uniform_int_distribution<> dis(0, words.size() - 1);
+		return dis(gen);
+    }
+
+	size_t current_index = 0;
+
 public:
 	CStringGenerator()
 	{
@@ -40,8 +83,17 @@ END_COM_MAP()
 
 	DECLARE_PROTECT_FINAL_CONSTRUCT()
 
+    // This function is called after the object is created, but before it is used.
+	// Recommended for initialization tasks because it can, unlike the constructor, return a value (an HRESULT).
 	HRESULT FinalConstruct()
 	{
+		std::cout << "[ATL]: Loading words... ";
+        bool success = load_words();
+        if (!success) {
+            std::cerr << "Failed to load words from " << get_words_path() << std::endl;
+            return E_FAIL;
+        }
+		std::cout << "Loaded " << words.size() << " words." << std::endl;
 		return S_OK;
 	}
 
