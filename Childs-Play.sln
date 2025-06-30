@@ -85,6 +85,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AtlComDllPS", "AtlComDllPS\
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AtlComClient", "AtlComClient\AtlComClient.vcxproj", "{6F15F5AE-8305-410C-9D4A-B13F09DF8794}"
+	ProjectSection(ProjectDependencies) = postProject
+		{23F7DBE7-C1AB-D640-EBB5-5E47A0B47646} = {23F7DBE7-C1AB-D640-EBB5-5E47A0B47646}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

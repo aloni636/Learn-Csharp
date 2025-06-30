@@ -22,8 +22,18 @@
        Build -> Rebuild Solution
        ```
    - To disable automatic registration, set `Configuration Properties > Linker > General > Register Output` to **No**.
+   - **Note**: For intelisense to suggest completion items from the COM project the client **has to be run successfully at least once**.
 5. To view the registered ATL COM object:
-   - Locate the UUID of the ATL object in your project under **Source Files -> AtlComDll.idl**. The coclass UUID is the registered identifier.
+   - Locate the UUID of the ATL project in your project under **Source Files -> AtlComDll.idl**. The library UUID is the registered identifier.
+       ```
+       { ... }
+       [
+	       uuid(f5eb3f19-113a-4265-93d5-83cab932c7b5),
+	       version(1.0),
+       ]
+       library AtlComDllLib 
+       { ... }
+       ```
    - Open **regedit.exe** (Win+R -> regedit.exe) and navigate to:
      - **System-wide:** `Computer\HKEY_CLASSES_ROOT\CLSID\{coclass UUID}`
      - **Per-user:** `HKEY_CURRENT_USER\Software\Classes\CLSID\{coclass UUID}`
